@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id            String         @id @default(cuid())
+  name          String
+  email         String?        @unique
+  phone         String?
+  company       String?
+  status        CustomerStatus @default(ACTIVE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+  payments      Payment[]
+}
+
+model Service {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  basePrice     Float
+  billingCycle  BillingCycle   @default(MONTHLY)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String             @id @default(cuid())
+  customerId    String
+  serviceId     String
+  status        SubscriptionStatus @default(ACTIVE)
+  startDate     DateTime           @default(now())
+  endDate       DateTime?
+  nextRenewal   DateTime?
+  price         Float              // Specific price for this customer/sub
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  service       Service            @relation(fields: [serviceId], references: [id])
+  payments      Payment[]
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  amount         Float
+  paymentDate    DateTime      @default(now())
+  status         PaymentStatus @default(COMPLETED)
+  method         PaymentMethod @default(TRANSFER)
+  subscriptionId String?
+  customerId     String
+  notes          String?
+  createdAt      DateTime      @default(now())
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  customer       Customer      @relation(fields: [customerId], references: [id])
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  LEAD
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  CARD
+  OTHERS
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+}
