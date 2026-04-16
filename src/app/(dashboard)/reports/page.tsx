@@ -46,7 +46,8 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("all"); 
   const [searchTerm, setSearchTerm] = useState("");
-  const [reportMode, setReportMode] = useState<"consolidated" | "detailed">("consolidated");
+  const [reportMode, setReportMode] = useState<"consolidated" | "detailed">("detailed");
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -321,7 +322,7 @@ export default function ReportsPage() {
               Consolidado
             </button>
             <button 
-              onClick={() => setReportMode('detailed')}
+              onClick={() => { setReportMode('detailed'); setExpandedItems([]); }}
               className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${reportMode === 'detailed' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400 hover:text-zinc-600'}`}
             >
               Detallado
@@ -553,32 +554,80 @@ export default function ReportsPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    detailedData.map((item) => (
-                      <TableRow key={item.id} className="border-zinc-50 hover:bg-zinc-50/30 transition-colors uppercase">
-                        <TableCell className="py-4 pl-7">
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-zinc-900">{item.customerName}</span>
-                            <span className="text-[8px] font-bold text-zinc-300">{item.customerDoc}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="text-[8px] font-bold px-2 py-0 border-zinc-200 text-zinc-500">
-                            {item.serviceName}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] font-bold text-zinc-500">
-                          S/ {item.totalCost.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] font-bold text-emerald-600">
-                          S/ {item.totalPaid.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
-                        </TableCell>
-                        <TableCell className="text-right pr-7">
-                          <span className={`text-[10px] font-bold ${item.balance > 0 ? "text-red-600" : "text-emerald-700"}`}>
-                            S/ {item.balance.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    detailedData.map((item) => {
+                      const isExpanded = expandedItems.includes(item.id);
+                      return (
+                        <Fragment key={item.id}>
+                          <TableRow 
+                            onClick={() => setExpandedItems(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id])}
+                            className="border-zinc-50 hover:bg-zinc-50/50 transition-all uppercase cursor-pointer group"
+                          >
+                            <TableCell className="py-4 pl-7">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-zinc-900 group-hover:text-black transition-colors">{item.customerName}</span>
+                                <span className="text-[8px] font-bold text-zinc-300">{item.customerDoc}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-[8px] font-bold px-2 py-0 border-zinc-200 text-zinc-500 whitespace-nowrap">
+                                {item.serviceName}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right text-[10px] font-bold text-zinc-500">
+                              S/ {item.totalCost.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell className="text-right text-[10px] font-bold text-emerald-600">
+                              S/ {item.totalPaid.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell className="text-right pr-7">
+                              <div className="flex items-center justify-end gap-3">
+                                <span className={`text-[10px] font-bold ${item.balance > 0 ? "text-red-600" : "text-emerald-700"}`}>
+                                  S/ {item.balance.toLocaleString('en-PE', { minimumFractionDigits: 2 })}
+                                </span>
+                                <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                                  <ArrowRight size={12} className="text-zinc-300" />
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {isExpanded && (
+                            <TableRow className="bg-zinc-50/30 hover:bg-zinc-50/50 transition-colors">
+                              <TableCell colSpan={5} className="p-0 border-none">
+                                <div className="px-7 py-4 animate-in slide-in-from-top-2 duration-300">
+                                  <div className="bg-white border border-zinc-100 rounded-2xl shadow-sm overflow-hidden">
+                                     <table className="w-full">
+                                        <thead className="bg-zinc-50/50 border-b border-zinc-100">
+                                           <tr>
+                                              <th className="py-2.5 px-4 text-left text-[8px] font-bold uppercase text-zinc-400 tracking-widest">Fecha Amortización</th>
+                                              <th className="py-2.5 px-4 text-left text-[8px] font-bold uppercase text-zinc-400 tracking-widest">Detalle del Pago / Método</th>
+                                              <th className="py-2.5 px-4 text-right text-[8px] font-bold uppercase text-zinc-400 tracking-widest">Importe</th>
+                                           </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-zinc-50">
+                                           {item.history && item.history.length > 0 ? item.history.map((h: any, hi: number) => (
+                                              <tr key={hi} className="hover:bg-zinc-50/30 transition-colors">
+                                                 <td className="py-3 px-4 text-[9px] font-bold text-zinc-500">{new Date(h.paymentDate).toLocaleDateString()}</td>
+                                                 <td className="py-3 px-4 flex flex-col gap-0.5">
+                                                    <span className="text-[9px] font-bold text-zinc-900 uppercase">Abono #{item.history.length - hi} - {h.method}</span>
+                                                    <span className="text-[8px] font-medium text-zinc-400 uppercase tracking-tight">{h.operationNumber ? `OP: ${h.operationNumber}` : 'SIN NRO OP.'} {h.targetAccount ? `• ${h.targetAccount}` : ''}</span>
+                                                 </td>
+                                                 <td className="py-3 px-4 text-right text-[10px] font-bold text-emerald-600">S/ {h.amount.toLocaleString('en-PE', { minimumFractionDigits: 2 })}</td>
+                                              </tr>
+                                           )) : (
+                                              <tr>
+                                                 <td colSpan={3} className="py-4 text-center text-[9px] font-bold text-zinc-300 uppercase italic">Sin amortizaciones registradas</td>
+                                              </tr>
+                                           )}
+                                        </tbody>
+                                     </table>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </Fragment>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
