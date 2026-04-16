@@ -748,20 +748,28 @@ export default function ReportsPage() {
                               S/ {d.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                            </td>
                         </tr>
-                        {/* SUB-TABLA DE ABONOS DETALLADOS */}
+                        {/* SUB-TABLA DE ABONOS DETALLADOS (TABULAR ESTRUCTURADA) */}
                         {d.history && d.history.length > 0 && (
                           <tr>
-                            <td colSpan={4} className="py-0 px-0">
-                               <div className="pl-6 border-l-[1.5px] border-zinc-900 my-1">
-                                  <table className="w-full">
+                            <td colSpan={4} className="py-2 px-1">
+                               <div className="pl-12 my-1">
+                                  <table className="w-full border-separate border-spacing-0 border border-zinc-300 rounded-md overflow-hidden bg-zinc-50/20">
+                                     <thead>
+                                        <tr className="bg-zinc-100/50">
+                                           <th className="py-1.5 px-3 text-left text-[6px] font-black uppercase text-zinc-500 tracking-widest border-b border-zinc-300">Fecha</th>
+                                           <th className="py-1.5 px-3 text-left text-[6px] font-black uppercase text-zinc-500 tracking-widest border-b border-zinc-300">Descripción / Detalles del Abono</th>
+                                           <th className="py-1.5 px-3 text-right text-[6px] font-black uppercase text-zinc-500 tracking-widest border-b border-zinc-300">Importe Parcial</th>
+                                        </tr>
+                                     </thead>
                                      <tbody>
                                         {d.history.map((h: any, hi: number) => (
-                                          <tr key={hi} className="border-b border-zinc-50 last:border-none">
-                                             <td className="py-1 text-[7px] font-bold text-zinc-400 uppercase w-20">{new Date(h.paymentDate).toLocaleDateString()}</td>
-                                             <td className="py-1 text-[7px] font-medium text-zinc-500 uppercase italic">
-                                                Abono #{d.history.length - hi} - {h.method} {h.operationNumber ? `(OP: ${h.operationNumber})` : ''}
+                                          <tr key={hi} className="last:border-none">
+                                             <td className="py-2 px-3 text-[7px] font-bold text-zinc-500 uppercase border-b border-zinc-100">{new Date(h.paymentDate).toLocaleDateString()}</td>
+                                             <td className="py-2 px-3 text-[7px] font-medium text-zinc-600 uppercase border-b border-zinc-100 bg-white">
+                                                Abono #{d.history.length - hi} - {h.method} {h.operationNumber ? `(OP: ${h.operationNumber})` : ''} 
+                                                <span className="ml-2 text-zinc-300 text-[6px]">{h.targetAccount ? `• DESTINO: ${h.targetAccount}` : ''}</span>
                                              </td>
-                                             <td className="py-1 text-[8px] font-bold text-right text-zinc-900 pr-[140px]">S/ {h.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                                             <td className="py-2 px-3 text-[8px] font-bold text-right text-zinc-900 border-b border-zinc-100 bg-white">S/ {h.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                                           </tr>
                                         ))}
                                      </tbody>
