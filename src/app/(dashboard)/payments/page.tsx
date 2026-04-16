@@ -78,6 +78,7 @@ export default function PaymentsPage() {
   const [customerEntities, setCustomerEntities] = useState<{subs: any[], deals: any[]}>({subs: [], deals: []});
 
   const [formData, setFormData] = useState({
+    id: "",
     customerId: "",
     subscriptionId: "",
     dealId: "",
@@ -105,6 +106,7 @@ export default function PaymentsPage() {
 
   const handleOpenNew = () => {
     setFormData({
+      id: "",
       customerId: "",
       subscriptionId: "",
       dealId: "",
@@ -120,6 +122,45 @@ export default function PaymentsPage() {
     });
     setFoundCustomer(null);
     setCustomerEntities({subs: [], deals: []});
+    setOpen(true);
+  };
+
+  const handleEdit = async (payment: any) => {
+    setFormData({
+      id: payment.id,
+      customerId: payment.customerId,
+      subscriptionId: payment.subscriptionId || "",
+      dealId: payment.dealId || "",
+      docType: "DNI", // No viene en el objeto payment directamente pero lo recuaremos con docNumber
+      docNumber: payment.customerDoc || "",
+      amount: payment.amount.toString(),
+      method: payment.method,
+      status: payment.status,
+      paymentDate: new Date(payment.paymentDate).toISOString().split('T')[0],
+      notes: payment.notes || "",
+      operationNumber: payment.operationNumber || "",
+      targetAccount: payment.targetAccount || ""
+    });
+
+    // Cargar información del cliente y sus entidades
+    setSearchingCustomer(true);
+    try {
+      const { getCustomerByDoc, getSubscriptionsByCustomer, getDealsByCustomer } = await import("@/lib/actions");
+      const result = await getCustomerByDoc(payment.customerDoc);
+      if (result.success && result.customer) {
+        setFoundCustomer(result.customer);
+        const [subs, deals] = await Promise.all([
+           getSubscriptionsByCustomer(result.customer.id),
+           getDealsByCustomer(result.customer.id)
+        ]);
+        setCustomerEntities({subs, deals});
+      }
+    } catch (e) {
+      toast.error("Error al cargar datos del cliente.");
+    } finally {
+      setSearchingCustomer(false);
+    }
+    
     setOpen(true);
   };
 
@@ -161,6 +202,7 @@ export default function PaymentsPage() {
     setIsSaving(true);
     try {
       const result = await savePayment({
+        id: formData.id || undefined,
         customerId: formData.customerId,
         subscriptionId: formData.subscriptionId || undefined,
         dealId: formData.dealId || undefined,
@@ -224,9 +266,11 @@ export default function PaymentsPage() {
           <DialogContent className="border-zinc-200 bg-white text-zinc-950 shadow-2xl sm:max-w-[700px] p-0 overflow-hidden rounded-2xl">
             <DialogHeader className="px-7 py-4 bg-zinc-50/50 border-b border-zinc-100 flex flex-row items-center justify-between space-y-0 text-left">
               <div className="flex flex-col">
-                <DialogTitle className="text-lg text-zinc-950 font-semibold tracking-tight uppercase">Registro de Ingreso</DialogTitle>
+                <DialogTitle className="text-lg text-zinc-950 font-semibold tracking-tight uppercase">
+                  {formData.id ? 'Editar Registro' : 'Registro de Ingreso'}
+                </DialogTitle>
                 <DialogDescription className="text-zinc-400 text-[9px] mt-0.5 font-semibold uppercase tracking-widest">
-                  Detalles de la transacción y vinculación de cuenta.
+                  {formData.id ? 'Modificar detalles de la transacción existente.' : 'Detalles de la transacción y vinculación de cuenta.'}
                 </DialogDescription>
               </div>
             </DialogHeader>
@@ -490,15 +534,21 @@ export default function PaymentsPage() {
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 border-none ring-0"><MoreHorizontal size={14} /></Button>
                          </DropdownMenuTrigger>
                          <DropdownMenuContent align="end" className="w-48 p-1 rounded-xl shadow-2xl border-zinc-200 bg-white">
-                            <DropdownMenuLabel className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest px-3 py-2 mt-0.5 leading-none">Tesorería</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-zinc-50 my-1" />
-                            <DropdownMenuItem 
-                              onClick={() => { setDeleteId(payment.id); setDeleteOpen(true); }} 
-                              className="gap-2.5 text-[10px] font-semibold py-2.5 rounded-lg px-3 cursor-pointer text-red-500 focus:text-red-600 focus:bg-red-50"
-                            >
-                               <Trash2 size={14} /> Anular Registro
-                            </DropdownMenuItem>
-                         </DropdownMenuContent>
+                             <DropdownMenuLabel className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest px-3 py-2 mt-0.5 leading-none">Tesorería</DropdownMenuLabel>
+                             <DropdownMenuSeparator className="bg-zinc-50 my-1" />
+                             <DropdownMenuItem 
+                               onClick={() => handleEdit(payment)} 
+                               className="gap-2.5 text-[10px] font-semibold py-2.5 rounded-lg px-3 cursor-pointer text-zinc-600 focus:text-zinc-900 focus:bg-zinc-50"
+                             >
+                                <Eye size={14} /> Editar Registro
+                             </DropdownMenuItem>
+                             <DropdownMenuItem 
+                               onClick={() => { setDeleteId(payment.id); setDeleteOpen(true); }} 
+                               className="gap-2.5 text-[10px] font-semibold py-2.5 rounded-lg px-3 cursor-pointer text-red-500 focus:text-red-600 focus:bg-red-50"
+                             >
+                                <Trash2 size={14} /> Anular Registro
+                             </DropdownMenuItem>
+                          </DropdownMenuContent>
                       </DropdownMenu>
                   </TableCell>
                 </TableRow>

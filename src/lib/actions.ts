@@ -155,14 +155,31 @@ export async function savePayment(data: any) {
   if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
-    const id = crypto.randomUUID();
-    await sql`
-      INSERT INTO "Payment" (id, amount, "paymentDate", status, method, "customerId", "subscriptionId", "dealId", notes, "operationNumber", "targetAccount")
-      VALUES (${id}, ${data.amount}, ${parseDate(data.paymentDate)}, ${data.status}, ${data.method}, ${data.customerId}, ${data.subscriptionId || null}, ${data.dealId || null}, ${data.notes || null}, ${data.operationNumber || null}, ${data.targetAccount || null})
-    `;
+    if (data.id) {
+      await sql`
+        UPDATE "Payment" SET 
+          amount = ${data.amount}, 
+          "paymentDate" = ${parseDate(data.paymentDate)}, 
+          status = ${data.status}, 
+          method = ${data.method}, 
+          "customerId" = ${data.customerId}, 
+          "subscriptionId" = ${data.subscriptionId || null}, 
+          "dealId" = ${data.dealId || null}, 
+          notes = ${data.notes || null}, 
+          "operationNumber" = ${data.operationNumber || null}, 
+          "targetAccount" = ${data.targetAccount || null}
+        WHERE id = ${data.id}
+      `;
+    } else {
+      const id = data.id || crypto.randomUUID();
+      await sql`
+        INSERT INTO "Payment" (id, amount, "paymentDate", status, method, "customerId", "subscriptionId", "dealId", notes, "operationNumber", "targetAccount")
+        VALUES (${id}, ${data.amount}, ${parseDate(data.paymentDate)}, ${data.status}, ${data.method}, ${data.customerId}, ${data.subscriptionId || null}, ${data.dealId || null}, ${data.notes || null}, ${data.operationNumber || null}, ${data.targetAccount || null})
+      `;
+    }
     revalidatePath("/payments");
     if (data.dealId) revalidatePath("/contracts");
-    return { success: true, id };
+    return { success: true };
   } catch (e: any) { return { success: false, error: e.message }; }
 }
 
