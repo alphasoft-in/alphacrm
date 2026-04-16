@@ -631,8 +631,8 @@ export default function ReportsPage() {
                 <div className="bg-zinc-50 border border-zinc-200 p-5 rounded-xl text-zinc-900">
                    <p className="text-[7px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Ingresos Totales (Haber)</p>
                    <div className="flex items-baseline gap-1">
-                      <span className="text-[9px] font-bold text-emerald-600">S/</span>
-                      <span className="text-xl font-bold tracking-tighter text-emerald-600">
+                      <span className="text-[9px] font-bold text-zinc-900">S/</span>
+                      <span className="text-xl font-bold tracking-tighter text-zinc-900">
                          {filteredHaber.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                    </div>
@@ -661,8 +661,8 @@ export default function ReportsPage() {
                 <div className="bg-zinc-50 border border-zinc-200 p-5 rounded-xl text-zinc-900">
                    <p className="text-[7px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Saldo Pendiente (Deuda)</p>
                    <div className="flex items-baseline gap-1">
-                      <span className="text-[9px] font-bold text-red-600">S/</span>
-                      <span className="text-xl font-bold tracking-tighter text-red-600">
+                      <span className="text-[9px] font-bold text-zinc-900">S/</span>
+                      <span className="text-xl font-bold tracking-tighter text-zinc-900">
                          {detailedData.reduce((acc, d) => acc + d.balance, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                    </div>
@@ -670,8 +670,8 @@ export default function ReportsPage() {
                 <div className="bg-zinc-50 border border-zinc-200 p-5 rounded-xl text-zinc-900">
                    <p className="text-[7px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Total Amortizado (Cobrado)</p>
                    <div className="flex items-baseline gap-1">
-                      <span className="text-[9px] font-bold text-emerald-600">S/</span>
-                      <span className="text-xl font-bold tracking-tighter text-emerald-600">
+                      <span className="text-[9px] font-bold text-zinc-900">S/</span>
+                      <span className="text-xl font-bold tracking-tighter text-zinc-900">
                          {detailedData.reduce((acc, d) => acc + d.totalPaid, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                    </div>
@@ -723,7 +723,7 @@ export default function ReportsPage() {
                          <td className="py-3 px-1 text-[10px] font-bold text-zinc-900 uppercase tracking-tight">{act.description}</td>
                          <td className="py-3 px-1 text-[8px] font-bold text-zinc-300 uppercase">{act.category}</td>
                          <td className="py-3 px-1 text-center">
-                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${act.type === 'HABER' ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-100 text-zinc-400'}`}>
+                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${act.type === 'HABER' ? 'bg-zinc-100 text-zinc-900' : 'bg-zinc-100 text-zinc-400'}`}>
                                {act.type}
                             </span>
                          </td>
@@ -742,9 +742,9 @@ export default function ReportsPage() {
                                 <span className="text-[7px] text-zinc-500 font-medium">{d.serviceName}</span>
                               </div>
                            </td>
-                           <td className="py-3 px-1 text-[9px] font-bold text-right text-zinc-400">S/ {d.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                           <td className="py-3 px-1 text-[9px] font-bold text-right text-emerald-600">S/ {d.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                           <td className={`py-3 px-1 text-[10px] font-black text-right ${d.balance > 0 ? 'text-red-600' : 'text-emerald-700'}`}>
+                           <td className="py-3 px-1 text-[9px] font-bold text-right text-zinc-500">S/ {d.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                           <td className="py-3 px-1 text-[9px] font-bold text-right text-zinc-900">S/ {d.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                           <td className={`py-3 px-1 text-[10px] font-black text-right text-zinc-900`}>
                               S/ {d.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                            </td>
                         </tr>
@@ -752,17 +752,16 @@ export default function ReportsPage() {
                         {d.history && d.history.length > 0 && (
                           <tr>
                             <td colSpan={4} className="py-0 px-0">
-                               <div className="pl-6 border-l-2 border-zinc-200 my-2">
+                               <div className="pl-6 border-l-[1.5px] border-zinc-900 my-1">
                                   <table className="w-full">
-                                     <tbody className="divide-y divide-zinc-100">
+                                     <tbody>
                                         {d.history.map((h: any, hi: number) => (
-                                          <tr key={hi}>
-                                             <td className="py-1.5 text-[7px] font-bold text-zinc-400 uppercase w-20">{new Date(h.paymentDate).toLocaleDateString()}</td>
-                                             <td className="py-1.5 text-[7px] font-semibold text-zinc-500 uppercase italic">
+                                          <tr key={hi} className="border-b border-zinc-50 last:border-none">
+                                             <td className="py-1 text-[7px] font-bold text-zinc-400 uppercase w-20">{new Date(h.paymentDate).toLocaleDateString()}</td>
+                                             <td className="py-1 text-[7px] font-medium text-zinc-500 uppercase italic">
                                                 Abono #{d.history.length - hi} - {h.method} {h.operationNumber ? `(OP: ${h.operationNumber})` : ''}
                                              </td>
-                                             <td className="py-1.5 text-[8px] font-bold text-right text-emerald-600">S/ {h.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                                             <td className="w-12"></td>
+                                             <td className="py-1 text-[8px] font-bold text-right text-zinc-900 pr-[140px]">S/ {h.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                                           </tr>
                                         ))}
                                      </tbody>
