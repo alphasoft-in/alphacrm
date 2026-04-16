@@ -319,7 +319,13 @@ export default function PaymentsPage() {
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto de Ingreso (S/.)</Label>
                     <div className="relative">
-                       <Input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="pl-8 border-zinc-200 h-11 font-semibold bg-zinc-50/30" />
+                       <Input 
+                          type="number" 
+                          value={formData.amount} 
+                          onChange={e => setFormData({...formData, amount: e.target.value})} 
+                          onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                          className="pl-8 border-zinc-200 h-11 font-semibold bg-zinc-50/30" 
+                       />
                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 font-bold">S/</span>
                     </div>
                  </div>
@@ -350,7 +356,12 @@ export default function PaymentsPage() {
                  </div>
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Entidad / Cuenta Destino</Label>
-                    <Input value={formData.targetAccount} onChange={e => setFormData({...formData, targetAccount: e.target.value})} placeholder="BCP, BBVA, etc." className="border-zinc-200 h-10 text-xs font-semibold bg-white rounded-xl shadow-none outline-none" />
+                    <Input 
+                       value={formData.targetAccount} 
+                       onChange={e => setFormData({...formData, targetAccount: e.target.value})} 
+                       placeholder="BCP, BBVA, etc." 
+                       className="border-zinc-200 h-10 text-xs font-semibold bg-white rounded-xl shadow-none outline-none placeholder:font-normal placeholder:text-zinc-300" 
+                    />
                  </div>
               </div>
 
