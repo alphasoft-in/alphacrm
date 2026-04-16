@@ -435,7 +435,7 @@ export default function ContractsPage() {
                      </div>
 
                      <div className="space-y-1.5">
-                          <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto de Inicial Pactado (S/.)</Label>
+                          <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto Inicial (S/.)</Label>
                           <div className="relative">
                              <Input 
                                 type="number"
