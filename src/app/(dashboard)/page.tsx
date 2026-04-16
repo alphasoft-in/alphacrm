@@ -14,13 +14,13 @@ export default async function Dashboard() {
   const data = await getDashboardStats();
   
   const stats = [
-    { title: "Recaudación Confirmada", value: `S/ ${data?.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 }) || "0.00"}`, desc: "" },
-    { title: "Entidades Activas", value: data?.totalCustomers.toString() || "0", desc: "" },
-    { title: "Vínculos Recurrentes", value: data?.activeSubscriptions.toString() || "0", desc: "" },
-    { title: "Servicios Disponibles", value: data?.totalServices.toString() || "0", desc: "" },
+    { title: "Recaudación Realizada", value: `S/ ${data?.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 }) || "0.00"}`, desc: "FLUJO TOTAL" },
+    { title: "Entidades Activas", value: data?.totalCustomers.toString() || "0", desc: "CLIENTES" },
+    { title: "Vínculos Activos", value: data?.activeSubscriptions.toString() || "0", desc: "CONTRATOS + SUBS" },
+    { title: "Gestión Integrada", value: data?.totalServices.toString() || "0", desc: "SERVICIOS TOT." },
   ];
 
-  const recentSubs = data?.recentSubscriptions || [];
+  const recentActivity = data?.recentActivity || [];
 
   return (
     <div className="flex flex-col gap-6 select-none animate-in fade-in duration-500">
@@ -80,27 +80,30 @@ export default async function Dashboard() {
                 <History size={14} className="text-zinc-400" />
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-900">Actividad Reciente</span>
              </div>
-             <Link href="/subscriptions">
+             <Link href="/reports">
                 <ArrowUpRight size={14} className="text-zinc-400 hover:text-zinc-900 transition-colors" />
              </Link>
           </div>
           
           <div className="flex-1 overflow-auto divide-y divide-zinc-50">
-             {recentSubs.length === 0 ? (
+             {recentActivity.length === 0 ? (
                 <div className="h-full flex items-center justify-center p-8">
                    <p className="text-[9px] font-medium text-zinc-300 uppercase tracking-widest">Esperando Transacciones</p>
                 </div>
-             ) : recentSubs.slice(0, 7).map((sub: any, i: number) => (
+             ) : recentActivity.slice(0, 7).map((act: any, i: number) => (
                 <div key={i} className="p-4 py-3 hover:bg-zinc-50/50 transition-colors flex items-center justify-between group">
                    <div className="flex flex-col gap-0.5 flex-1 min-w-0 pr-4">
-                      <span className="text-[10px] font-semibold text-zinc-900 truncate uppercase tracking-tight">{sub.customerName}</span>
-                      <span className="text-[8px] font-medium text-zinc-400 truncate uppercase tracking-widest">{sub.serviceName}</span>
+                      <span className="text-[10px] font-semibold text-zinc-900 truncate uppercase tracking-tight">{act.customerName}</span>
+                      <span className="text-[8px] font-medium text-zinc-400 truncate uppercase tracking-widest">{act.serviceName}</span>
                    </div>
-                   <div className="h-1.5 w-1.5 rounded-full bg-zinc-100 group-hover:bg-zinc-900 transition-colors" />
+                   <div className="flex flex-col items-end gap-0.5">
+                      <span className="text-[8px] font-bold text-zinc-500 uppercase">{new Date(act.date).toLocaleDateString()}</span>
+                      <div className="h-1.5 w-1.5 rounded-full bg-zinc-100 group-hover:bg-zinc-900 transition-colors" />
+                   </div>
                 </div>
              ))}
           </div>
-          <Link href="/subscriptions" className="p-4 text-center bg-zinc-50/80 hover:bg-zinc-100 border-t border-zinc-100 transition-all group">
+          <Link href="/reports" className="p-4 text-center bg-zinc-50/80 hover:bg-zinc-100 border-t border-zinc-100 transition-all group">
              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-900">Ver Auditoría Completa</span>
           </Link>
         </div>

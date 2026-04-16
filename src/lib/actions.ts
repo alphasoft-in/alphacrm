@@ -366,17 +366,29 @@ export async function getDashboardStats() {
   try {
     const stats = await Promise.all([
       sql`SELECT COUNT(*) as count FROM "Customer"`,
-      sql`SELECT COUNT(*) as count FROM "Service"`,
-      sql`SELECT COUNT(*) as count FROM "Subscription" WHERE status = 'ACTIVE'`,
+      sql`SELECT (SELECT COUNT(*) FROM "Service") + (SELECT COUNT(*) FROM "Deal") as count`,
+      sql`SELECT (SELECT COUNT(*) FROM "Subscription" WHERE status = 'ACTIVE') + (SELECT COUNT(*) FROM "Deal" WHERE status != 'CANCELLED') as count`,
       sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED'`,
-      sql`SELECT s.id, c.name as "customerName", ser.name as "serviceName", s."startDate" FROM "Subscription" s JOIN "Customer" c ON s."customerId" = c.id JOIN "Service" ser ON s."serviceId" = ser.id WHERE s.status = 'ACTIVE' ORDER BY s."createdAt" DESC LIMIT 5`
+      sql`
+        SELECT p.id, c.name as "customerName", 
+        COALESCE(ser.name, d.name) as "serviceName", 
+        p."paymentDate" as "date"
+        FROM "Payment" p
+        JOIN "Customer" c ON p."customerId" = c.id
+        LEFT JOIN "Subscription" s ON p."subscriptionId" = s.id
+        LEFT JOIN "Service" ser ON s."serviceId" = ser.id
+        LEFT JOIN "Deal" d ON p."dealId" = d.id
+        WHERE p.status = 'COMPLETED'
+        ORDER BY p."createdAt" DESC
+        LIMIT 10
+      `
     ]);
     return {
       totalCustomers: parseInt(stats[0][0].count),
       totalServices: parseInt(stats[1][0].count),
       activeSubscriptions: parseInt(stats[2][0].count),
       totalRevenue: parseFloat(stats[3][0].total || 0),
-      recentSubscriptions: stats[4]
+      recentActivity: stats[4]
     };
   } catch (e) { return null; }
 }
