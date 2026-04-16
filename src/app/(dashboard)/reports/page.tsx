@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Fragment } from "react";
 import { toast } from "sonner";
 import { getPayments, getPettyCashMovements, getSubscriptions, getDeals } from "@/lib/actions";
 
@@ -117,7 +118,8 @@ export default function ReportsPage() {
 
   // Cálculos para el Reporte Detallado (Estado de Cuenta por Servicio/Contrato)
   const detailedSubscriptions = subscriptions.map(sub => {
-    const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED');
+    const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED')
+                                .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
     const totalPaid = subPayments.reduce((acc, p) => acc + Number(p.amount), 0);
     const balance = Number(sub.price) - totalPaid;
     
@@ -131,12 +133,15 @@ export default function ReportsPage() {
       balance: balance,
       status: sub.status,
       lastPayment: subPayments.length > 0 ? subPayments[0].paymentDate : null,
-      paymentsCount: subPayments.length
+      paymentsCount: subPayments.length,
+      history: subPayments // Guardar historial de pagos
     };
   });
 
   const detailedDeals = deals.map(deal => {
-    const totalPaid = Number(deal.paidAmount || 0);
+    const dealPayments = payments.filter(p => p.dealId === deal.id && p.status === 'COMPLETED')
+                                 .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
+    const totalPaid = dealPayments.reduce((acc, p) => acc + Number(p.amount), 0);
     const balance = Number(deal.totalAmount) - totalPaid;
     
     return {
@@ -148,8 +153,9 @@ export default function ReportsPage() {
       totalPaid: totalPaid,
       balance: balance,
       status: deal.status,
-      lastPayment: null, // Podríamos buscarlo si fuera necesario
-      paymentsCount: 0 // Podríamos contarlos si fuera necesario
+      lastPayment: dealPayments.length > 0 ? dealPayments[0].paymentDate : null,
+      paymentsCount: dealPayments.length,
+      history: dealPayments // Guardar historial de pagos
     };
   });
 
@@ -690,22 +696,21 @@ export default function ReportsPage() {
             </h3>
             <table className="w-full">
                <thead>
-                  <tr className="border-b border-zinc-900/10">
+                  <tr className="border-b-[1.5px] border-zinc-900">
                      {reportMode === 'consolidated' ? (
                        <>
-                         <th className="py-3 px-1 text-left text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Fecha</th>
-                         <th className="py-3 px-1 text-left text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Concepto</th>
-                         <th className="py-3 px-1 text-left text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Cat.</th>
-                         <th className="py-3 px-1 text-center text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Clase</th>
-                         <th className="py-3 px-1 text-right text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Importe</th>
+                         <th className="py-2 px-1 text-left text-[8px] font-black uppercase text-zinc-900 tracking-widest">Fecha</th>
+                         <th className="py-2 px-1 text-left text-[8px] font-black uppercase text-zinc-900 tracking-widest">Descripción del Concepto</th>
+                         <th className="py-2 px-1 text-left text-[8px] font-black uppercase text-zinc-900 tracking-widest">Categoría</th>
+                         <th className="py-2 px-1 text-center text-[8px] font-black uppercase text-zinc-900 tracking-widest">Tipo</th>
+                         <th className="py-2 px-1 text-right text-[8px] font-black uppercase text-zinc-900 tracking-widest">Importe</th>
                        </>
                      ) : (
                        <>
-                         <th className="py-3 px-1 text-left text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Cliente / ID</th>
-                         <th className="py-3 px-1 text-left text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Servicio</th>
-                         <th className="py-3 px-1 text-right text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Costo</th>
-                         <th className="py-3 px-1 text-right text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Abonado</th>
-                         <th className="py-3 px-1 text-right text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Saldo</th>
+                         <th className="py-2 px-1 text-left text-[8px] font-black uppercase text-zinc-900 tracking-widest">Cliente / Servicio</th>
+                         <th className="py-2 px-1 text-right text-[8px] font-black uppercase text-zinc-900 tracking-widest">Costo Total</th>
+                         <th className="py-2 px-1 text-right text-[8px] font-black uppercase text-zinc-900 tracking-widest">Total Abonado</th>
+                         <th className="py-2 px-1 text-right text-[8px] font-black uppercase text-zinc-900 tracking-widest">Saldo Deudor</th>
                        </>
                      )}
                   </tr>
@@ -729,18 +734,49 @@ export default function ReportsPage() {
                     ))
                   ) : (
                     detailedData.map((d, i) => (
-                      <tr key={i} className="hover:bg-zinc-50/50">
-                         <td className="py-3 px-1 text-[9px] font-bold text-zinc-900 uppercase">
-                            <div>{d.customerName}</div>
-                            <div className="text-[7px] text-zinc-400 font-medium">{d.customerDoc}</div>
-                         </td>
-                         <td className="py-3 px-1 text-[9px] font-bold text-zinc-500 uppercase">{d.serviceName}</td>
-                         <td className="py-3 px-1 text-[9px] font-bold text-right text-zinc-400">S/ {d.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                         <td className="py-3 px-1 text-[9px] font-bold text-right text-emerald-600">S/ {d.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                         <td className={`py-3 px-1 text-[10px] font-bold text-right ${d.balance > 0 ? 'text-red-600' : 'text-emerald-700'}`}>
-                            S/ {d.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                         </td>
-                      </tr>
+                      <Fragment key={i}>
+                        <tr className="bg-zinc-50/50">
+                           <td className="py-3 px-1 text-[9px] font-bold text-zinc-900 uppercase">
+                              <div className="flex flex-col">
+                                <span>{d.customerName}</span>
+                                <span className="text-[7px] text-zinc-500 font-medium">{d.serviceName}</span>
+                              </div>
+                           </td>
+                           <td className="py-3 px-1 text-[9px] font-bold text-right text-zinc-400">S/ {d.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                           <td className="py-3 px-1 text-[9px] font-bold text-right text-emerald-600">S/ {d.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                           <td className={`py-3 px-1 text-[10px] font-black text-right ${d.balance > 0 ? 'text-red-600' : 'text-emerald-700'}`}>
+                              S/ {d.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                           </td>
+                        </tr>
+                        {/* SUB-TABLA DE ABONOS DETALLADOS */}
+                        {d.history && d.history.length > 0 && (
+                          <tr>
+                            <td colSpan={4} className="py-0 px-0">
+                               <div className="pl-6 border-l-2 border-zinc-200 my-2">
+                                  <table className="w-full">
+                                     <tbody className="divide-y divide-zinc-100">
+                                        {d.history.map((h: any, hi: number) => (
+                                          <tr key={hi}>
+                                             <td className="py-1.5 text-[7px] font-bold text-zinc-400 uppercase w-20">{new Date(h.paymentDate).toLocaleDateString()}</td>
+                                             <td className="py-1.5 text-[7px] font-semibold text-zinc-500 uppercase italic">
+                                                Abono #{d.history.length - hi} - {h.method} {h.operationNumber ? `(OP: ${h.operationNumber})` : ''}
+                                             </td>
+                                             <td className="py-1.5 text-[8px] font-bold text-right text-emerald-600">S/ {h.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                                             <td className="w-12"></td>
+                                          </tr>
+                                        ))}
+                                     </tbody>
+                                  </table>
+                               </div>
+                            </td>
+                          </tr>
+                        )}
+                        {(!d.history || d.history.length === 0) && (
+                          <tr>
+                             <td colSpan={4} className="py-2 pl-8 text-[7px] font-bold text-zinc-300 uppercase italic">Sin amortizaciones registradas</td>
+                          </tr>
+                        )}
+                      </Fragment>
                     ))
                   )}
                </tbody>
