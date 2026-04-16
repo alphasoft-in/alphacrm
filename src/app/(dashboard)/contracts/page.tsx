@@ -307,14 +307,14 @@ export default function ContractsPage() {
                     setFormData({...formData, docType: v, docNumber: "", customerId: ""});
                     setFoundCustomer(null);
                   }}>
-                    <SelectTrigger className="w-[140px] border-none rounded-none font-bold text-xs focus:ring-0 uppercase h-full bg-zinc-100/50 border-r border-zinc-100 px-4">
+                    <SelectTrigger className="w-[140px] border-none rounded-none font-medium text-[10px] focus:ring-0 uppercase h-full bg-zinc-100/50 border-r border-zinc-100 px-4">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-zinc-100">
-                      <SelectItem value="dni" className="text-xs uppercase font-bold">DNI</SelectItem>
-                      <SelectItem value="ruc" className="text-xs uppercase font-bold">RUC</SelectItem>
-                      <SelectItem value="ce" className="text-xs uppercase font-bold">C. Extranjería</SelectItem>
-                      <SelectItem value="pasaporte" className="text-xs uppercase font-bold">Pasaporte</SelectItem>
+                      <SelectItem value="dni" className="text-[10px] uppercase font-medium">DNI</SelectItem>
+                      <SelectItem value="ruc" className="text-[10px] uppercase font-medium">RUC</SelectItem>
+                      <SelectItem value="ce" className="text-[10px] uppercase font-medium">C. Extranjería</SelectItem>
+                      <SelectItem value="pasaporte" className="text-[10px] uppercase font-medium">Pasaporte</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input 
@@ -423,13 +423,13 @@ export default function ContractsPage() {
                              const total = parseFloat(formData.totalAmount) || 0;
                              setFormData({...formData, paymentTerms: v, downPayment: is50 ? (total/2).toString() : formData.downPayment});
                         }}>
-                           <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                           <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                               <SelectValue />
                            </SelectTrigger>
                            <SelectContent className="bg-white rounded-xl border-zinc-200">
-                              <SelectItem value="50-50" className="text-[10px] font-bold uppercase">50% / 50%</SelectItem>
-                              <SelectItem value="INSTALLMENTS" className="text-[10px] font-bold uppercase">Inicial + Cuotas</SelectItem>
-                              <SelectItem value="TOTAL" className="text-[10px] font-bold uppercase">Total Anticipado</SelectItem>
+                              <SelectItem value="50-50" className="text-[10px] font-medium uppercase">50% / 50%</SelectItem>
+                              <SelectItem value="INSTALLMENTS" className="text-[10px] font-medium uppercase">Inicial + Cuotas</SelectItem>
+                              <SelectItem value="TOTAL" className="text-[10px] font-medium uppercase">Total Anticipado</SelectItem>
                            </SelectContent>
                         </Select>
                      </div>
@@ -453,34 +453,34 @@ export default function ContractsPage() {
                          <div className="space-y-1.5 animate-in zoom-in-95 duration-200">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">N° Cuotas</Label>
                             <Select value={formData.installments} onValueChange={v => setFormData({...formData, installments: v})}>
-                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
-                                  <SelectItem value="1" className="font-bold">1 CUOTA</SelectItem>
-                                  <SelectItem value="2" className="font-bold">2 CUOTAS</SelectItem>
-                                  <SelectItem value="3" className="font-bold">3 CUOTAS</SelectItem>
-                                  <SelectItem value="4" className="font-bold">4 CUOTAS</SelectItem>
-                                  <SelectItem value="5" className="font-bold">5 CUOTAS</SelectItem>
-                                  <SelectItem value="6" className="font-bold">6 CUOTAS</SelectItem>
-                                  <SelectItem value="8" className="font-bold">8 CUOTAS</SelectItem>
-                                  <SelectItem value="10" className="font-bold">10 CUOTAS</SelectItem>
-                                  <SelectItem value="12" className="font-bold">12 CUOTAS</SelectItem>
-                                  <SelectItem value="24" className="font-bold">24 CUOTAS</SelectItem>
+                                  <SelectItem value="1" className="text-[10px] font-medium">1 CUOTA</SelectItem>
+                                  <SelectItem value="2" className="text-[10px] font-medium">2 CUOTAS</SelectItem>
+                                  <SelectItem value="3" className="text-[10px] font-medium">3 CUOTAS</SelectItem>
+                                  <SelectItem value="4" className="text-[10px] font-medium">4 CUOTAS</SelectItem>
+                                  <SelectItem value="5" className="text-[10px] font-medium">5 CUOTAS</SelectItem>
+                                  <SelectItem value="6" className="text-[10px] font-medium">6 CUOTAS</SelectItem>
+                                  <SelectItem value="8" className="text-[10px] font-medium">8 CUOTAS</SelectItem>
+                                  <SelectItem value="10" className="text-[10px] font-medium">10 CUOTAS</SelectItem>
+                                  <SelectItem value="12" className="text-[10px] font-medium">12 CUOTAS</SelectItem>
+                                  <SelectItem value="24" className="text-[10px] font-medium">24 CUOTAS</SelectItem>
                                </SelectContent>
                             </Select>
                          </div>
                          <div className="space-y-1.5">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Origen</Label>
                             <Select value={formData.contactMethod} onValueChange={v => setFormData({...formData, contactMethod: v})}>
-                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
-                                  <SelectItem value="WHATSAPP" className="text-[10px] font-bold uppercase">WhatsApp</SelectItem>
-                                  <SelectItem value="FACEBOOK" className="text-[10px] font-bold uppercase">Facebook</SelectItem>
-                                  <SelectItem value="INSTAGRAM" className="text-[10px] font-bold uppercase">Instagram</SelectItem>
-                                  <SelectItem value="REFERAL" className="text-[10px] font-bold uppercase">Recomendación</SelectItem>
+                                  <SelectItem value="WHATSAPP" className="text-[10px] font-medium uppercase">WhatsApp</SelectItem>
+                                  <SelectItem value="FACEBOOK" className="text-[10px] font-medium uppercase">Facebook</SelectItem>
+                                  <SelectItem value="INSTAGRAM" className="text-[10px] font-medium uppercase">Instagram</SelectItem>
+                                  <SelectItem value="REFERAL" className="text-[10px] font-medium uppercase">Recomendación</SelectItem>
                                </SelectContent>
                             </Select>
                          </div>
@@ -489,14 +489,14 @@ export default function ContractsPage() {
                        <div className="space-y-1.5 col-span-2">
                            <Label className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Canal de Contacto</Label>
                            <Select value={formData.contactMethod} onValueChange={v => setFormData({...formData, contactMethod: v})}>
-                              <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none w-full">
+                              <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none w-full">
                                  <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="bg-white rounded-xl border-zinc-200">
-                                 <SelectItem value="WHATSAPP" className="text-[10px] font-bold uppercase">WhatsApp</SelectItem>
-                                 <SelectItem value="FACEBOOK" className="text-[10px] font-bold uppercase">Facebook</SelectItem>
-                                 <SelectItem value="INSTAGRAM" className="text-[10px] font-bold uppercase">Instagram</SelectItem>
-                                 <SelectItem value="REFERAL" className="text-[10px] font-bold uppercase">Recomendación</SelectItem>
+                                 <SelectItem value="WHATSAPP" className="text-[10px] font-medium uppercase">WhatsApp</SelectItem>
+                                 <SelectItem value="FACEBOOK" className="text-[10px] font-medium uppercase">Facebook</SelectItem>
+                                 <SelectItem value="INSTAGRAM" className="text-[10px] font-medium uppercase">Instagram</SelectItem>
+                                 <SelectItem value="REFERAL" className="text-[10px] font-medium uppercase">Recomendación</SelectItem>
                               </SelectContent>
                            </Select>
                        </div>
