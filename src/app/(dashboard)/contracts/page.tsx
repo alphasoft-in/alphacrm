@@ -302,7 +302,7 @@ export default function ContractsPage() {
             <div className="p-6 grid gap-4 max-h-[70vh] overflow-y-auto uppercase">
                <div className="space-y-1.5">
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Parte Contratante</Label>
-                <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-12 bg-zinc-50/30 focus-within:border-zinc-400 transition-all shadow-sm">
+                <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-10 bg-zinc-50/30 focus-within:border-zinc-400 transition-all shadow-sm">
                   <Select value={formData.docType} onValueChange={v => {
                     setFormData({...formData, docType: v, docNumber: "", customerId: ""});
                     setFoundCustomer(null);
@@ -364,7 +364,7 @@ export default function ContractsPage() {
                       value={foundCustomer?.address || ''} 
                       onChange={e => setFoundCustomer({...foundCustomer, address: e.target.value.toUpperCase()})}
                       placeholder="INGRESE LA DIRECCIÓN DOMICILIARIA..."
-                      className="border-zinc-200 bg-zinc-50/30 h-11 !text-[10px] font-semibold uppercase shadow-none focus-within:border-zinc-400 text-zinc-900 placeholder:text-zinc-300 placeholder:!text-[10px]"
+                      className="border-zinc-200 bg-zinc-50/30 h-9 !text-[10px] font-semibold uppercase shadow-none focus-within:border-zinc-400 text-zinc-900 placeholder:text-zinc-300 placeholder:!text-[10px]"
                     />
                   </div>
                 )}
@@ -376,7 +376,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-11 text-sm font-semibold shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 text-sm font-semibold shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
@@ -403,14 +403,14 @@ export default function ContractsPage() {
                                     downPayment: formData.paymentTerms === '50-50' ? (parseFloat(val) / 2).toString() : formData.downPayment
                                 });
                             }}
-                            className="pl-8 border-zinc-200 h-11 font-bold text-sm bg-zinc-50/30" 
+                            className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-zinc-50/30" 
                          />
                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha de Firma</Label>
-                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-11 text-xs font-bold uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
                      </div>
                   </div>
 
@@ -423,7 +423,7 @@ export default function ContractsPage() {
                              const total = parseFloat(formData.totalAmount) || 0;
                              setFormData({...formData, paymentTerms: v, downPayment: is50 ? (total/2).toString() : formData.downPayment});
                         }}>
-                           <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                           <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
                               <SelectValue />
                            </SelectTrigger>
                            <SelectContent className="bg-white rounded-xl border-zinc-200">
@@ -442,7 +442,7 @@ export default function ContractsPage() {
                                 disabled={formData.paymentTerms === 'TOTAL'}
                                 value={formData.downPayment}
                                 onChange={e => setFormData({...formData, downPayment: e.target.value})}
-                                className="pl-8 border-zinc-200 h-10 font-bold text-sm bg-white rounded-xl shadow-none outline-none w-full" 
+                                className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-white rounded-xl shadow-none outline-none w-full" 
                              />
                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                           </div>
@@ -453,7 +453,7 @@ export default function ContractsPage() {
                          <div className="space-y-1.5 animate-in zoom-in-95 duration-200">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">N° Cuotas</Label>
                             <Select value={formData.installments} onValueChange={v => setFormData({...formData, installments: v})}>
-                               <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
@@ -473,7 +473,7 @@ export default function ContractsPage() {
                          <div className="space-y-1.5">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Origen</Label>
                             <Select value={formData.contactMethod} onValueChange={v => setFormData({...formData, contactMethod: v})}>
-                               <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
@@ -489,7 +489,7 @@ export default function ContractsPage() {
                        <div className="space-y-1.5 col-span-2">
                            <Label className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Canal de Contacto</Label>
                            <Select value={formData.contactMethod} onValueChange={v => setFormData({...formData, contactMethod: v})}>
-                              <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none w-full">
+                              <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-bold uppercase bg-white rounded-xl shadow-none outline-none w-full">
                                  <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="bg-white rounded-xl border-zinc-200">
