@@ -290,19 +290,28 @@ export default function PaymentsPage() {
                          </SelectContent>
                       </Select>
                    </div>
-                   <div className="space-y-1.5">
-                      <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Vincular Contrato</Label>
-                      <Select value={formData.dealId} onValueChange={v => setFormData({...formData, dealId: v, subscriptionId: ""})}>
-                         <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-zinc-50/30 shadow-none">
-                            <SelectValue placeholder="---" />
-                         </SelectTrigger>
-                         <SelectContent className="bg-white rounded-xl border-zinc-200">
-                            {customerEntities.deals.map(d => (
-                               <SelectItem key={d.id} value={d.id} className="text-[10px] font-bold uppercase py-2">{d.name} (TOTAL: S/ {d.totalAmount})</SelectItem>
-                            ))}
-                         </SelectContent>
-                      </Select>
-                   </div>
+                    <div className="space-y-1.5">
+                       <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Vincular Contrato</Label>
+                       <Select value={formData.dealId} onValueChange={v => {
+                          const deal = customerEntities.deals.find(d => d.id === v);
+                          const balance = deal ? Math.max(0, parseFloat(deal.totalAmount) - parseFloat(deal.paidAmount)) : 0;
+                          setFormData({...formData, dealId: v, subscriptionId: "", amount: balance > 0 ? balance.toString() : formData.amount});
+                       }}>
+                          <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-zinc-50/30 shadow-none">
+                             <SelectValue placeholder="---" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white rounded-xl border-zinc-200">
+                             {customerEntities.deals.map(d => {
+                                const balance = Math.max(0, parseFloat(d.totalAmount) - parseFloat(d.paidAmount));
+                                return (
+                                   <SelectItem key={d.id} value={d.id} className="text-[10px] font-bold uppercase py-2">
+                                      {d.name} (SALDO: S/ {balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })})
+                                   </SelectItem>
+                                );
+                             })}
+                          </SelectContent>
+                       </Select>
+                    </div>
                 </div>
               )}
 

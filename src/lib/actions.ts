@@ -332,7 +332,14 @@ export async function getDealsByCustomer(customerId: string) {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
-  try { return await sql`SELECT id, name, "totalAmount" FROM "Deal" WHERE "customerId" = ${customerId} AND status != 'CANCELLED'`; } catch (e) { return []; }
+  try { 
+    return await sql`
+      SELECT id, name, "totalAmount",
+      COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = "Deal".id AND status = 'COMPLETED'), 0) as "paidAmount"
+      FROM "Deal" 
+      WHERE "customerId" = ${customerId} AND status != 'CANCELLED'
+    `; 
+  } catch (e) { return []; }
 }
 
 export async function getDashboardStats() {
