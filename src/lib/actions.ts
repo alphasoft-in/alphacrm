@@ -64,17 +64,17 @@ export async function updateCustomer(id: string, data: any) {
 
 export async function deactivateCustomer(id: string) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     await sql`UPDATE "Customer" SET status = 'INACTIVE', "updatedAt" = NOW() WHERE id = ${id}`;
     return { success: true };
-  } catch (e: any) { return { success: false }; }
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
 
 export async function getCustomerByDoc(docNumber: string) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     const results = await sql`SELECT * FROM "Customer" WHERE "docNumber" = ${docNumber} LIMIT 1`;
@@ -88,8 +88,8 @@ export async function getCustomerByDoc(docNumber: string) {
       `;
       return { success: true, customer, subscriptions };
     }
-    return { success: false };
-  } catch (e) { return { success: false }; }
+    return { success: false, error: "Cliente no encontrado" };
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
 
 // --- SERVICES ---
@@ -102,7 +102,7 @@ export async function getServices() {
 
 export async function saveService(data: any) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     const id = crypto.randomUUID();
@@ -113,7 +113,7 @@ export async function saveService(data: any) {
 
 export async function updateService(id: string, data: any) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     await sql`UPDATE "Service" SET name = ${data.name}, description = ${data.description || null}, "basePrice" = ${data.basePrice}, "billingCycle" = ${data.billingCycle}, "taxStatus" = ${data.taxStatus || 'INC_IGV'}, "updatedAt" = NOW() WHERE id = ${id}`;
@@ -123,9 +123,9 @@ export async function updateService(id: string, data: any) {
 
 export async function deleteService(id: string) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
-  try { await sql`DELETE FROM "Service" WHERE id = ${id}`; return { success: true }; } catch (e) { return { success: false, error: 'Tiene suscripciones' }; }
+  try { await sql`DELETE FROM "Service" WHERE id = ${id}`; return { success: true }; } catch (e: any) { return { success: false, error: e.message || 'Tiene suscripciones' }; }
 }
 
 // --- PAYMENTS ---
@@ -148,7 +148,7 @@ export async function getPayments() {
 
 export async function savePayment(data: any) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     const id = crypto.randomUUID();
@@ -193,13 +193,13 @@ export async function getDeals() {
 
 export async function saveDeal(data: any) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     if (data.id) {
-      await sql`UPDATE "Deal" SET name = ${data.name}, description = ${data.description || null}, "totalAmount" = ${data.totalAmount}, "downPayment" = ${parseFloat(data.downPayment || 0)}, status = ${data.status || 'OPEN'}, "contactMethod" = ${data.contactMethod || null}, "paymentTerms" = ${data.paymentTerms || "50-50"}, installments = ${parseInt(data.installments || 1)}, "dealDate" = ${new Date(data.dealDate)}, "updatedAt" = NOW() WHERE id = ${data.id}`;
+       await sql`UPDATE "Deal" SET name = ${data.name}, description = ${data.description || null}, "totalAmount" = ${data.totalAmount}, "downPayment" = ${parseFloat(data.downPayment || 0)}, status = ${data.status || 'OPEN'}, "contactMethod" = ${data.contactMethod || null}, "paymentTerms" = ${data.paymentTerms || "50-50"}, installments = ${parseInt(data.installments || 1)}, "dealDate" = ${new Date(data.dealDate)}, "updatedAt" = NOW() WHERE id = ${data.id}`;
     } else {
-      await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${new Date(data.dealDate)}, NOW())`;
+       await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${new Date(data.dealDate)}, NOW())`;
     }
     revalidatePath("/contracts");
     return { success: true };
@@ -208,9 +208,9 @@ export async function saveDeal(data: any) {
 
 export async function deleteDeal(id: string) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
-  try { await sql`DELETE FROM "Deal" WHERE id = ${id}`; revalidatePath("/contracts"); return { success: true }; } catch (e) { return { success: false, error: 'Tiene pagos' }; }
+  try { await sql`DELETE FROM "Deal" WHERE id = ${id}`; revalidatePath("/contracts"); return { success: true }; } catch (e: any) { return { success: false, error: e.message || 'Tiene pagos' }; }
 }
 
 // --- SUBSCRIPTIONS ---
@@ -244,11 +244,11 @@ export async function getUpcomingRenewals() {
 
 export async function saveSubscription(data: any) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     const serviceRes = await sql`SELECT "billingCycle", "basePrice" FROM "Service" WHERE id = ${data.serviceId}`;
-    if (serviceRes.length === 0) return { success: false };
+    if (serviceRes.length === 0) return { success: false, error: "Servicio no encontrado" };
     const service = serviceRes[0];
     const startDate = new Date(data.startDate);
     const nextRenewal = new Date(startDate);
@@ -416,11 +416,11 @@ export async function savePettyCashMovement(data: any) {
 
 export async function deletePettyCashMovement(id: string) {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return { success: false };
+  if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
     await sql`DELETE FROM "PettyCash" WHERE id = ${id}`;
     revalidatePath("/petty-cash");
     return { success: true };
-  } catch (e) { return { success: false }; }
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
