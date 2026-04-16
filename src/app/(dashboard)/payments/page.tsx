@@ -250,8 +250,8 @@ export default function PaymentsPage() {
                     onClick={handleSearchCustomer} 
                     disabled={searchingCustomer}
                     type="button"
-                    variant="ghost" 
-                    className="h-full w-10 text-zinc-400 hover:text-zinc-900 border-l border-zinc-100 rounded-none bg-zinc-100/30"
+                    variant="secondary" 
+                    className="h-full w-12 bg-zinc-900 hover:bg-black text-white border-l border-zinc-100 rounded-none transition-colors"
                   >
                     {searchingCustomer ? <Loader2 size={12} className="animate-spin" /> : <Search size={14} />}
                   </Button>
@@ -319,14 +319,14 @@ export default function PaymentsPage() {
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto de Ingreso (S/.)</Label>
                     <div className="relative">
-                       <Input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="pl-8 border-zinc-200 h-11 font-bold bg-zinc-50/30" />
+                       <Input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="pl-8 border-zinc-200 h-11 font-semibold bg-zinc-50/30" />
                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 font-bold">S/</span>
                     </div>
                  </div>
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Medio / Canal</Label>
                     <Select value={formData.method} onValueChange={v => setFormData({...formData, method: v})}>
-                       <SelectTrigger className="border-zinc-200 h-11 text-[10px] font-bold uppercase text-left bg-zinc-50/30 shadow-none">
+                       <SelectTrigger className="border-zinc-200 h-11 text-[10px] font-semibold uppercase text-left bg-zinc-50/30 shadow-none">
                           <SelectValue />
                        </SelectTrigger>
                        <SelectContent className="bg-white rounded-xl border-zinc-200">
@@ -339,18 +339,18 @@ export default function PaymentsPage() {
                  </div>
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Valor</Label>
-                    <Input type="date" value={formData.paymentDate} onChange={e => setFormData({...formData, paymentDate: e.target.value})} className="border-zinc-200 h-11 text-xs font-bold uppercase bg-zinc-50/30 shadow-none" />
+                    <Input type="date" value={formData.paymentDate} onChange={e => setFormData({...formData, paymentDate: e.target.value})} className="border-zinc-200 h-11 text-xs font-semibold uppercase bg-zinc-50/30 shadow-none" />
                  </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 bg-zinc-50 border border-zinc-100 p-5 rounded-2xl items-end mt-1 transition-all hover:border-zinc-200">
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Nro de Operación</Label>
-                    <Input value={formData.operationNumber} onChange={e => setFormData({...formData, operationNumber: e.target.value})} className="border-zinc-200 h-10 text-xs font-bold bg-white rounded-xl shadow-none outline-none" />
+                    <Input value={formData.operationNumber} onChange={e => setFormData({...formData, operationNumber: e.target.value})} className="border-zinc-200 h-10 text-xs font-semibold bg-white rounded-xl shadow-none outline-none" />
                  </div>
                  <div className="space-y-1.5">
                     <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Entidad / Cuenta Destino</Label>
-                    <Input value={formData.targetAccount} onChange={e => setFormData({...formData, targetAccount: e.target.value})} placeholder="BCP, BBVA, etc." className="border-zinc-200 h-10 text-xs font-bold bg-white rounded-xl shadow-none outline-none" />
+                    <Input value={formData.targetAccount} onChange={e => setFormData({...formData, targetAccount: e.target.value})} placeholder="BCP, BBVA, etc." className="border-zinc-200 h-10 text-xs font-semibold bg-white rounded-xl shadow-none outline-none" />
                  </div>
               </div>
 
