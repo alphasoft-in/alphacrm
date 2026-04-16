@@ -752,7 +752,7 @@ export default function ReportsPage() {
                         {d.history && d.history.length > 0 && (
                           <tr>
                             <td colSpan={4} className="py-2 px-1">
-                               <div className="pl-12 my-1">
+                               <div className="pl-0 my-1 pb-4">
                                   <table className="w-full border-separate border-spacing-0 border border-zinc-300 rounded-md overflow-hidden bg-zinc-50/20">
                                      <thead>
                                         <tr className="bg-zinc-100/50">
