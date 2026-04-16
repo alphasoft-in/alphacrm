@@ -9,7 +9,7 @@ export default async function ProfilePage() {
 
   const sql = neon(process.env.DATABASE_URL!)
   const users = await sql`SELECT name, email FROM "User" WHERE id = ${session.userId} LIMIT 1`
-  const user = users[0]
+  const user = users[0] as { name: string | null; email: string }
 
   if (!user) redirect('/login')
 
