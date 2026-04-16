@@ -1,13 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Customer {
@@ -19,8 +15,26 @@ model Customer {
   status        CustomerStatus @default(ACTIVE)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  subscriptions Subscription[]
+  condition     String?
+  address       String?
+  district      String?
+  position      String?
+  docType       String?
+  docNumber     String?
   payments      Payment[]
+  subscriptions Subscription[]
+  deals         Deal[]         // Added: One-time deals
+}
+
+model DocumentCache {
+  id        String   @id @default(cuid())
+  docType   String
+  docNumber String
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([docType, docNumber])
 }
 
 model Service {
@@ -35,19 +49,38 @@ model Service {
 }
 
 model Subscription {
-  id            String             @id @default(cuid())
-  customerId    String
-  serviceId     String
-  status        SubscriptionStatus @default(ACTIVE)
-  startDate     DateTime           @default(now())
-  endDate       DateTime?
-  nextRenewal   DateTime?
-  price         Float              // Specific price for this customer/sub
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id          String             @id @default(cuid())
+  customerId  String
+  serviceId   String
+  status      SubscriptionStatus @default(ACTIVE)
+  startDate   DateTime           @default(now())
+  endDate     DateTime?
+  nextRenewal DateTime?
+  price       Float
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  productName String?
+  payments    Payment[]
+  customer    Customer           @relation(fields: [customerId], references: [id])
+  service     Service            @relation(fields: [serviceId], references: [id])
+}
 
-  customer      Customer           @relation(fields: [customerId], references: [id])
-  service       Service            @relation(fields: [serviceId], references: [id])
+model Deal {
+  id            String   @id @default(cuid())
+  customerId    String
+  name          String
+  description   String?
+  totalAmount   Float
+  downPayment   Float?    @default(0)
+  status        String   @default("OPEN") // OPEN, COMPLETED, CANCELLED
+  contactMethod String?  // WhatsApp, Facebook, Instagram, Referal, etc.
+  paymentTerms  String?  @default("50-50")
+  installments  Int?     @default(1)
+  dealDate      DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customer      Customer  @relation(fields: [customerId], references: [id])
   payments      Payment[]
 }
 
@@ -58,12 +91,17 @@ model Payment {
   status         PaymentStatus @default(COMPLETED)
   method         PaymentMethod @default(TRANSFER)
   subscriptionId String?
+  dealId         String?       // Added: Link to a specific deal
   customerId     String
   notes          String?
+  operationNumber String?     // Added: Operation number from voucher
+  targetAccount  String?      // Added: Bank account or digital wallet
+  voucherUrl     String?      // Added: Reference to receipt/voucher
   createdAt      DateTime      @default(now())
 
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   customer       Customer      @relation(fields: [customerId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  deal           Deal?         @relation(fields: [dealId], references: [id])
 }
 
 enum CustomerStatus {
@@ -90,6 +128,8 @@ enum PaymentMethod {
   CASH
   TRANSFER
   CARD
+  YAPE      // Added
+  PLIN      // Added
   OTHERS
 }
 
@@ -98,4 +138,19 @@ enum BillingCycle {
   QUARTERLY
   SEMI_ANNUAL
   ANNUAL
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
