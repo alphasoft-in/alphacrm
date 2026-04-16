@@ -35,12 +35,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { getPayments, getPettyCashMovements, getSubscriptions } from "@/lib/actions";
+import { getPayments, getPettyCashMovements, getSubscriptions, getDeals } from "@/lib/actions";
 
 export default function ReportsPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [movements, setMovements] = useState<any[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("all"); 
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,14 +50,16 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [payData, movData, subData] = await Promise.all([
+      const [payData, movData, subData, dealData] = await Promise.all([
         getPayments(),
         getPettyCashMovements(),
-        getSubscriptions()
+        getSubscriptions(),
+        getDeals()
       ]);
       setPayments(payData);
       setMovements(movData);
       setSubscriptions(subData);
+      setDeals(dealData);
       setLoading(false);
     };
     fetchData();
@@ -112,9 +115,8 @@ export default function ReportsPage() {
     return matchesPeriod && matchesSearch;
   });
 
-  // Cálculos para el Reporte Detallado (Estado de Cuenta por Servicio)
-  const detailedData = subscriptions.map(sub => {
-    // Buscar todos los pagos asociados a esta suscripción
+  // Cálculos para el Reporte Detallado (Estado de Cuenta por Servicio/Contrato)
+  const detailedSubscriptions = subscriptions.map(sub => {
     const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED');
     const totalPaid = subPayments.reduce((acc, p) => acc + Number(p.amount), 0);
     const balance = Number(sub.price) - totalPaid;
@@ -123,7 +125,7 @@ export default function ReportsPage() {
       id: sub.id,
       customerName: sub.customerName || 'SIN NOMBRE',
       customerDoc: sub.docNumber || '',
-      serviceName: sub.serviceName || 'SERVICIO',
+      serviceName: `${sub.serviceName || 'SERVICIO'} ${sub.productName ? `(${sub.productName})` : ''}`,
       totalCost: Number(sub.price),
       totalPaid: totalPaid,
       balance: balance,
@@ -131,7 +133,27 @@ export default function ReportsPage() {
       lastPayment: subPayments.length > 0 ? subPayments[0].paymentDate : null,
       paymentsCount: subPayments.length
     };
-  }).filter(item => {
+  });
+
+  const detailedDeals = deals.map(deal => {
+    const totalPaid = Number(deal.paidAmount || 0);
+    const balance = Number(deal.totalAmount) - totalPaid;
+    
+    return {
+      id: deal.id,
+      customerName: deal.customerName || 'SIN NOMBRE',
+      customerDoc: deal.docNumber || '',
+      serviceName: `CONTRATO: ${deal.name}`,
+      totalCost: Number(deal.totalAmount),
+      totalPaid: totalPaid,
+      balance: balance,
+      status: deal.status,
+      lastPayment: null, // Podríamos buscarlo si fuera necesario
+      paymentsCount: 0 // Podríamos contarlos si fuera necesario
+    };
+  });
+
+  const detailedData = [...detailedSubscriptions, ...detailedDeals].filter(item => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return item.customerName.toLowerCase().includes(term) ||
