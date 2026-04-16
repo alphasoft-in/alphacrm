@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { neon } from "@neondatabase/serverless";
+import { fromZonedTime } from "date-fns-tz";
+
+const LIMA_TZ = 'America/Lima';
+const parseDate = (dateStr: string) => fromZonedTime(dateStr, LIMA_TZ);
 
 const JSON_PE_BASE_URL = 'https://api.json.pe/api';
 
@@ -154,7 +158,7 @@ export async function savePayment(data: any) {
     const id = crypto.randomUUID();
     await sql`
       INSERT INTO "Payment" (id, amount, "paymentDate", status, method, "customerId", "subscriptionId", "dealId", notes, "operationNumber", "targetAccount")
-      VALUES (${id}, ${data.amount}, ${new Date(data.paymentDate)}, ${data.status}, ${data.method}, ${data.customerId}, ${data.subscriptionId || null}, ${data.dealId || null}, ${data.notes || null}, ${data.operationNumber || null}, ${data.targetAccount || null})
+      VALUES (${id}, ${data.amount}, ${parseDate(data.paymentDate)}, ${data.status}, ${data.method}, ${data.customerId}, ${data.subscriptionId || null}, ${data.dealId || null}, ${data.notes || null}, ${data.operationNumber || null}, ${data.targetAccount || null})
     `;
     revalidatePath("/payments");
     if (data.dealId) revalidatePath("/contracts");
@@ -197,9 +201,9 @@ export async function saveDeal(data: any) {
   const sql = neon(dbUrl);
   try {
     if (data.id) {
-       await sql`UPDATE "Deal" SET name = ${data.name}, description = ${data.description || null}, "totalAmount" = ${data.totalAmount}, "downPayment" = ${parseFloat(data.downPayment || 0)}, status = ${data.status || 'OPEN'}, "contactMethod" = ${data.contactMethod || null}, "paymentTerms" = ${data.paymentTerms || "50-50"}, installments = ${parseInt(data.installments || 1)}, "dealDate" = ${new Date(data.dealDate)}, "updatedAt" = NOW() WHERE id = ${data.id}`;
+       await sql`UPDATE "Deal" SET name = ${data.name}, description = ${data.description || null}, "totalAmount" = ${data.totalAmount}, "downPayment" = ${parseFloat(data.downPayment || 0)}, status = ${data.status || 'OPEN'}, "contactMethod" = ${data.contactMethod || null}, "paymentTerms" = ${data.paymentTerms || "50-50"}, installments = ${parseInt(data.installments || 1)}, "dealDate" = ${parseDate(data.dealDate)}, "updatedAt" = NOW() WHERE id = ${data.id}`;
     } else {
-       await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${new Date(data.dealDate)}, NOW())`;
+       await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${parseDate(data.dealDate)}, NOW())`;
     }
     revalidatePath("/contracts");
     return { success: true };
@@ -262,9 +266,9 @@ export async function saveSubscription(data: any) {
 
     const price = data.price ?? parseFloat(service.basePrice);
     if (data.id) {
-       await sql`UPDATE "Subscription" SET "serviceId" = ${data.serviceId}, "productName" = ${data.productName || null}, "startDate" = ${new Date(data.startDate)}, "nextRenewal" = ${nextRenewal}, "status" = ${data.status || 'ACTIVE'}, "price" = ${price}, "updatedAt" = NOW() WHERE id = ${data.id}`;
+       await sql`UPDATE "Subscription" SET "serviceId" = ${data.serviceId}, "productName" = ${data.productName || null}, "startDate" = ${parseDate(data.startDate)}, "nextRenewal" = ${nextRenewal}, "status" = ${data.status || 'ACTIVE'}, "price" = ${price}, "updatedAt" = NOW() WHERE id = ${data.id}`;
     } else {
-       await sql`INSERT INTO "Subscription" (id, "customerId", "serviceId", "productName", "startDate", "nextRenewal", "status", "price", "createdAt", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.serviceId}, ${data.productName || null}, ${new Date(data.startDate)}, ${nextRenewal}, ${data.status || 'ACTIVE'}, ${price}, NOW(), NOW())`;
+       await sql`INSERT INTO "Subscription" (id, "customerId", "serviceId", "productName", "startDate", "nextRenewal", "status", "price", "createdAt", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.serviceId}, ${data.productName || null}, ${parseDate(data.startDate)}, ${nextRenewal}, ${data.status || 'ACTIVE'}, ${price}, NOW(), NOW())`;
     }
     revalidatePath("/subscriptions");
     revalidatePath("/renewals");
@@ -395,15 +399,15 @@ export async function savePettyCashMovement(data: any) {
     const id = data.id || crypto.randomUUID();
     const amount = parseFloat(data.amount);
     if (data.id) {
-       await sql`UPDATE "PettyCash" SET description = ${data.description}, amount = ${amount}, type = ${data.type}, category = ${data.category}, "customerId" = ${data.customerId || null}, "customerName" = ${data.customerName || null}, "subscriptionId" = ${data.subscriptionId || null}, date = ${new Date(data.date)} WHERE id = ${data.id}`;
+       await sql`UPDATE "PettyCash" SET description = ${data.description}, amount = ${amount}, type = ${data.type}, category = ${data.category}, "customerId" = ${data.customerId || null}, "customerName" = ${data.customerName || null}, "subscriptionId" = ${data.subscriptionId || null}, date = ${parseDate(data.date)} WHERE id = ${data.id}`;
     } else {
-       await sql`INSERT INTO "PettyCash" (id, description, amount, type, category, "customerId", "customerName", "subscriptionId", date) VALUES (${id}, ${data.description}, ${amount}, ${data.type}, ${data.category}, ${data.customerId || null}, ${data.customerName || null}, ${data.subscriptionId || null}, ${new Date(data.date)})`;
+       await sql`INSERT INTO "PettyCash" (id, description, amount, type, category, "customerId", "customerName", "subscriptionId", date) VALUES (${id}, ${data.description}, ${amount}, ${data.type}, ${data.category}, ${data.customerId || null}, ${data.customerName || null}, ${data.subscriptionId || null}, ${parseDate(data.date)})`;
        
        // CRUCE DE INFORMACIÓN: Si es un ingreso por amortización vinculado a una suscripción, crear pago
        if (data.type === 'INCOME' && data.category === 'AMORTIZACION' && data.subscriptionId) {
          await sql`
            INSERT INTO "Payment" (id, amount, "paymentDate", status, method, "customerId", "subscriptionId", notes)
-           VALUES (${crypto.randomUUID()}, ${amount}, ${new Date(data.date)}, 'COMPLETED', 'CASH', ${data.customerId}, ${data.subscriptionId}, ${'AMORTIZACIÓN REGISTRADA VÍA CAJA CHICA: ' + data.description})
+           VALUES (${crypto.randomUUID()}, ${amount}, ${parseDate(data.date)}, 'COMPLETED', 'CASH', ${data.customerId}, ${data.subscriptionId}, ${'AMORTIZACIÓN REGISTRADA VÍA CAJA CHICA: ' + data.description})
          `;
        }
     }
