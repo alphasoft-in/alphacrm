@@ -403,6 +403,7 @@ export default function ContractsPage() {
                                     downPayment: formData.paymentTerms === '50-50' ? (parseFloat(val) / 2).toString() : formData.downPayment
                                 });
                             }}
+                            onWheel={(e) => (e.target as HTMLInputElement).blur()}
                             className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-zinc-50/30" 
                          />
                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
@@ -442,6 +443,7 @@ export default function ContractsPage() {
                                 disabled={formData.paymentTerms === 'TOTAL'}
                                 value={formData.downPayment}
                                 onChange={e => setFormData({...formData, downPayment: e.target.value})}
+                                onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                 className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-white rounded-xl shadow-none outline-none w-full" 
                              />
                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
