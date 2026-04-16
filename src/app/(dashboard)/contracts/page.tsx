@@ -462,6 +462,11 @@ export default function ContractsPage() {
                                   <SelectItem value="3" className="font-bold">3 CUOTAS</SelectItem>
                                   <SelectItem value="4" className="font-bold">4 CUOTAS</SelectItem>
                                   <SelectItem value="5" className="font-bold">5 CUOTAS</SelectItem>
+                                  <SelectItem value="6" className="font-bold">6 CUOTAS</SelectItem>
+                                  <SelectItem value="8" className="font-bold">8 CUOTAS</SelectItem>
+                                  <SelectItem value="10" className="font-bold">10 CUOTAS</SelectItem>
+                                  <SelectItem value="12" className="font-bold">12 CUOTAS</SelectItem>
+                                  <SelectItem value="24" className="font-bold">24 CUOTAS</SelectItem>
                                </SelectContent>
                             </Select>
                          </div>
