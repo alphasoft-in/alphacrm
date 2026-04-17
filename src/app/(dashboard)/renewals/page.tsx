@@ -222,7 +222,7 @@ export default function RenewalsPage() {
          </div>
       </div>
 
-      <Card className="border-zinc-200 bg-white shadow-sm overflow-hidden rounded-2xl">
+      <Card className="border-zinc-200 bg-white overflow-hidden rounded-2xl">
         <CardHeader className="p-4 border-b border-zinc-100">
            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
@@ -236,7 +236,7 @@ export default function RenewalsPage() {
         </CardHeader>
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-zinc-50/30">
+            <TableHeader>
               <TableRow className="border-zinc-100">
                 <TableHead className="text-[10px] font-semibold uppercase tracking-widest py-4 pl-6">Titular / Proyecto</TableHead>
                 <TableHead className="text-[10px] font-semibold uppercase tracking-widest">Servicio</TableHead>
@@ -265,7 +265,7 @@ export default function RenewalsPage() {
               ) : filteredRenewals.map((item) => {
                 const urgency = calculateUrgency(item.nextRenewal);
                 return (
-                  <TableRow key={item.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors uppercase">
+                  <TableRow key={item.id} className="border-zinc-100 transition-colors uppercase">
                     <TableCell className="py-4 pl-6">
                       <div className="flex items-center gap-3">
                          <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
