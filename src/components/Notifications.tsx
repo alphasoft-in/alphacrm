@@ -72,8 +72,7 @@ export function Notifications() {
       
       <DropdownMenuContent align="end" className="w-[300px] p-0 border-zinc-200 bg-white shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <DropdownMenuLabel className="px-5 py-4 bg-zinc-50 border-b border-zinc-100 flex flex-col gap-1">
-           <span className="text-[8px] font-semibold text-zinc-400 uppercase tracking-[0.2em] leading-none">Monitoreo Continental</span>
-           <span className="text-[10px] font-bold text-zinc-900 uppercase tracking-tight">Actividad y Alertas</span>
+           <span className="text-[10px] font-bold text-zinc-900 uppercase tracking-tight">Notificaciones</span>
         </DropdownMenuLabel>
         
         <div className="max-h-[350px] overflow-y-auto">
@@ -162,12 +161,12 @@ export function Notifications() {
         
         <DropdownMenuSeparator className="bg-zinc-50" />
         <DropdownMenuItem asChild>
-           <Link href="/renewals" className="w-full px-5 py-3 hover:bg-zinc-50 transition-colors flex items-center justify-center outline-none cursor-pointer">
+            <Link href="/reports" className="w-full px-5 py-3 hover:bg-zinc-50 transition-colors flex items-center justify-center outline-none cursor-pointer">
               <span className="text-[8px] font-bold text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-2">
-                 Ver todas las renovaciones
+                 Ver todas las actividades
                  <ArrowUpRight size={10} />
               </span>
-           </Link>
+            </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
