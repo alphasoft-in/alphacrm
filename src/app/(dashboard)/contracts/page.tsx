@@ -24,6 +24,7 @@ import {
   Layers,
   FileBadge,
   TrendingUp,
+  AlertTriangle,
   ArrowUpRight
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
