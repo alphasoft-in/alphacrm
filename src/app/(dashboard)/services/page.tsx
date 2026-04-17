@@ -286,7 +286,7 @@ export default function ServicesPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </header>
 
       <div className="grid gap-4 md:grid-cols-3">
          <Card className="border-zinc-200 bg-white shadow-sm rounded-2xl overflow-hidden relative group">
