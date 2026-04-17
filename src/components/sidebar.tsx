@@ -12,7 +12,9 @@ import {
   ChevronRight,
   Layers,
   Briefcase,
-  Wallet
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +28,8 @@ const menuItems = [
   { icon: Calendar, label: "Renovaciones", href: "/renewals" },
   { icon: BarChart3, label: "Reportes", href: "/reports" },
   { icon: Wallet, label: "Caja Chica", href: "/petty-cash" },
+  { icon: ArrowUpRight, label: "Cuentas x Cobrar", href: "/receivables" },
+  { icon: ArrowDownRight, label: "Cuentas x Pagar", href: "/payables" },
 ];
 
 export function Sidebar() {

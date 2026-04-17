@@ -657,3 +657,104 @@ export async function performMonthlyClosing(period: string, closedBy: string) {
     return { success: false, error: e.message };
   }
 }
+
+// --- ACCOUNTS PAYABLE ---
+export async function getAccountsPayable() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return [];
+  const sql = neon(dbUrl);
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS "AccountPayable" (
+        id TEXT PRIMARY KEY,
+        description TEXT NOT NULL,
+        supplier TEXT NOT NULL,
+        amount DECIMAL(12,2) NOT NULL,
+        "dueDate" TIMESTAMP NOT NULL,
+        status TEXT DEFAULT 'PENDING', -- 'PENDING', 'PAID', 'OVERDUE'
+        category TEXT,
+        "paidAt" TIMESTAMP,
+        "createdAt" TIMESTAMP DEFAULT NOW()
+      )
+    `;
+    return await sql`SELECT * FROM "AccountPayable" ORDER BY "dueDate" ASC`;
+  } catch (e) { return []; }
+}
+
+export async function saveAccountPayable(data: any) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return { success: false };
+  const sql = neon(dbUrl);
+  try {
+    if (data.id) {
+      await sql`UPDATE "AccountPayable" SET description = ${data.description}, supplier = ${data.supplier}, amount = ${data.amount}, "dueDate" = ${parseDate(data.dueDate)}, category = ${data.category} WHERE id = ${data.id}`;
+    } else {
+      await sql`INSERT INTO "AccountPayable" (id, description, supplier, amount, "dueDate", category) VALUES (${crypto.randomUUID()}, ${data.description}, ${data.supplier}, ${data.amount}, ${parseDate(data.dueDate)}, ${data.category})`;
+    }
+    revalidatePath("/payables");
+    return { success: true };
+  } catch (e: any) { return { success: false, error: e.message }; }
+}
+
+export async function payAccountPayable(id: string) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return { success: false };
+  const sql = neon(dbUrl);
+  try {
+    const payableRes = await sql`SELECT * FROM "AccountPayable" WHERE id = ${id}`;
+    if (payableRes.length === 0) return { success: false };
+    const p = payableRes[0];
+    
+    await sql`UPDATE "AccountPayable" SET status = 'PAID', "paidAt" = NOW() WHERE id = ${id}`;
+    await sql`INSERT INTO "PettyCash" (id, description, amount, type, category, date) VALUES (${crypto.randomUUID()}, ${'PAGO A PROVEEDOR: ' + p.supplier + ' - ' + p.description}, ${p.amount}, 'EXPENSE', ${p.category || 'OBLIGACIONES'}, NOW())`;
+    
+    revalidatePath("/payables");
+    revalidatePath("/petty-cash");
+    return { success: true };
+  } catch (e: any) { return { success: false, error: e.message }; }
+}
+
+export async function deleteAccountPayable(id: string) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return { success: false };
+  const sql = neon(dbUrl);
+  try {
+    await sql`DELETE FROM "AccountPayable" WHERE id = ${id}`;
+    revalidatePath("/payables");
+    return { success: true };
+  } catch (e) { return { success: false }; }
+}
+
+// --- ACCOUNTS RECEIVABLE ---
+export async function getAccountsReceivable() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return [];
+  const sql = neon(dbUrl);
+  try {
+    const receivables = await sql`
+      SELECT * FROM (
+        SELECT d.id, c.name as "customerName", d.name as "description", 
+          d."totalAmount" - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0) as balance,
+          d."dealDate" as "date",
+          'DEAL' as source
+        FROM "Deal" d
+        JOIN "Customer" c ON d."customerId" = c.id
+        WHERE d.status != 'CANCELLED'
+        
+        UNION ALL
+
+        SELECT s.id, c.name as "customerName", ser.name as "description",
+          s.price as balance,
+          s."nextRenewal" as "date",
+          'SUBSCRIPTION' as source
+        FROM "Subscription" s
+        JOIN "Customer" c ON s."customerId" = c.id
+        JOIN "Service" ser ON s."serviceId" = ser.id
+        WHERE (s.status = 'ACTIVE' OR s.status = 'active') AND s."nextRenewal" <= NOW()
+      ) AS combined
+      WHERE balance > 0
+      ORDER BY "date" ASC
+    `;
+    return receivables;
+  } catch (e) { return []; }
+}
