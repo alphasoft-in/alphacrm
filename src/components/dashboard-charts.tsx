@@ -140,9 +140,6 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
                   S/ {Math.max(...data.map(d => d.ingresos)).toLocaleString()}
                </span>
             </div>
-            <div className="w-10 h-10 rounded-full bg-zinc-950 flex items-center justify-center">
-               <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-            </div>
          </div>
       </div>
     </div>
