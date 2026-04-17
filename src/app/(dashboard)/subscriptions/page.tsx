@@ -526,8 +526,8 @@ export default function SubscriptionsPage() {
       </div>
 
       <Card className="border-zinc-200 bg-white shadow-sm overflow-hidden rounded-2xl">
-        <CardHeader className="p-4 border-b border-zinc-100">
-          <div className="relative group">
+        <CardHeader className="p-4 border-b border-zinc-100 flex flex-row items-center justify-between space-y-0 gap-4">
+          <div className="relative group flex-1">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
              <Input 
                value={search}
@@ -536,6 +536,9 @@ export default function SubscriptionsPage() {
                className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
              />
           </div>
+          <Button variant="outline" className="h-10 border-zinc-200 text-zinc-600 rounded-xl text-xs font-medium px-4">
+             <Filter size={14} className="mr-2" /> Filtros
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
