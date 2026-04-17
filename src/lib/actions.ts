@@ -401,6 +401,11 @@ export async function getDashboardStats() {
         GROUP BY month_num
         ORDER BY month_num
       `
+      sql`
+        SELECT SUM("totalAmount") - COALESCE(SUM((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED')), 0) as pending
+        FROM "Deal" d
+        WHERE status != 'CANCELLED'
+      `
     ]);
 
     const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
@@ -428,7 +433,8 @@ export async function getDashboardStats() {
       activeSubscriptions: parseInt(stats[2][0].count),
       totalRevenue: parseFloat(stats[3][0].total || 0),
       recentActivity: stats[4],
-      chartData: last6Months
+      chartData: last6Months,
+      totalPending: parseFloat(stats[7][0].pending || 0)
     };
   } catch (e) { return null; }
 }

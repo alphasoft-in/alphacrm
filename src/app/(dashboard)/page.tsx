@@ -50,7 +50,7 @@ export default async function Dashboard() {
 
       <div className="grid md:grid-cols-3 gap-4 h-[350px]">
         {/* Core Monitor */}
-        <div className="md:col-span-2 bg-white border border-zinc-200 rounded-2xl p-6 flex flex-col justify-between overflow-hidden relative group">
+        <div className="md:col-span-2 bg-white border border-zinc-200 rounded-2xl p-8 flex flex-col justify-between overflow-hidden relative group">
           <div className="absolute top-0 right-0 p-8 opacity-5">
             <Activity className="w-64 h-64 text-zinc-950" />
           </div>
@@ -60,19 +60,47 @@ export default async function Dashboard() {
               <div className="w-1.5 h-1.5 bg-zinc-950 rounded-full animate-pulse" />
               <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-900">Monitor de Rendimiento</span>
             </div>
-          </div>
-
-          <div className="relative z-10 mt-10">
-            <h2 className="text-2xl font-semibold text-zinc-900 tracking-tight uppercase leading-none mb-3">Proceso de Analítica</h2>
-            <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest leading-relaxed max-w-sm">
-              Analizando dinámicas de flujo de caja y métricas de retención de clientes. estado: <span className="text-zinc-900 font-semibold">Procesando flujos en segundo plano.</span>
-            </p>
-          </div>
-
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="flex-1 h-0.5 bg-zinc-100 rounded-full overflow-hidden">
-               <div className="h-full w-1/3 bg-zinc-950" />
+            <div className="bg-zinc-50 px-3 py-1 rounded-full border border-zinc-100">
+               <span className="text-[9px] font-bold text-zinc-500 uppercase">Salud del Ecosistema: <span className="text-zinc-900">Óptima</span></span>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 relative z-10 mt-6">
+             <div className="flex flex-col gap-2">
+                <h2 className="text-3xl font-semibold text-zinc-900 tracking-tight uppercase leading-none">Pulso Operativo</h2>
+                <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest leading-relaxed max-w-[240px]">
+                  Análisis consolidado de flujos de caja, amortizaciones y retención proyectada para el ciclo actual.
+                </p>
+                <div className="mt-4 flex items-center gap-6">
+                   <div className="flex flex-col">
+                      <span className="text-[8px] font-bold text-zinc-300 uppercase">Crecimiento (Mes)</span>
+                      <span className="text-lg font-bold text-zinc-900">+12.4%</span>
+                   </div>
+                   <div className="flex flex-col">
+                      <span className="text-[8px] font-bold text-zinc-300 uppercase">Tasa de Amortización</span>
+                      <span className="text-lg font-bold text-zinc-900">84.2%</span>
+                   </div>
+                </div>
+             </div>
+
+             <div className="bg-zinc-900 rounded-2xl p-6 text-white flex flex-col justify-between shadow-xl shadow-zinc-200">
+                <div className="flex flex-col gap-1">
+                   <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Saldo Pendiente (Deals)</span>
+                   <span className="text-2xl font-bold tracking-tighter">S/ {data.totalPending.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                   <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-widest">Estado de Cobranza</span>
+                   <div className="h-1.5 w-24 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-full w-2/3 bg-white" />
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          <div className="relative z-10 flex items-center gap-4 mt-6">
+             <div className="flex-1 h-0.5 bg-zinc-100 rounded-full overflow-hidden">
+                <div className="h-full w-1/3 bg-zinc-950 animate-progress" />
+             </div>
           </div>
         </div>
 
