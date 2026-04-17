@@ -381,14 +381,54 @@ export async function getDashboardStats() {
         WHERE p.status = 'COMPLETED'
         ORDER BY p."createdAt" DESC
         LIMIT 10
+      `,
+      // Nueva consulta para datos de gráficos (últimos 6 meses)
+      sql`
+        SELECT 
+          TO_CHAR("paymentDate", 'Mon') as month,
+          SUM(amount) as total
+        FROM "Payment"
+        WHERE status = 'COMPLETED' AND "paymentDate" >= NOW() - INTERVAL '6 months'
+        GROUP BY TO_CHAR("paymentDate", 'Mon'), EXTRACT(MONTH FROM "paymentDate")
+        ORDER BY EXTRACT(MONTH FROM "paymentDate")
+      `,
+      sql`
+        SELECT 
+          TO_CHAR(date, 'Mon') as month,
+          SUM(amount) as total
+        FROM "PettyCash"
+        WHERE type = 'EXPENSE' AND date >= NOW() - INTERVAL '6 months'
+        GROUP BY TO_CHAR(date, 'Mon'), EXTRACT(MONTH FROM date)
+        ORDER BY EXTRACT(MONTH FROM date)
       `
     ]);
+
+    // Combinar datos de ingresos y gastos por mes
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = new Date().getMonth();
+    const last6Months = [];
+    for (let i = 5; i >= 0; i--) {
+      const mIdx = (currentMonth - i + 12) % 12;
+      last6Months.push(months[mIdx]);
+    }
+
+    const chartData = last6Months.map(m => {
+      const rev = stats[5].find((r: any) => r.month === m);
+      const exp = stats[6].find((e: any) => e.month === m);
+      return {
+        month: m.toUpperCase(),
+        ingresos: parseFloat(rev?.total || 0),
+        egresos: parseFloat(exp?.total || 0)
+      };
+    });
+
     return {
       totalCustomers: parseInt(stats[0][0].count),
       totalServices: parseInt(stats[1][0].count),
       activeSubscriptions: parseInt(stats[2][0].count),
       totalRevenue: parseFloat(stats[3][0].total || 0),
-      recentActivity: stats[4]
+      recentActivity: stats[4],
+      chartData: chartData
     };
   } catch (e) { return null; }
 }

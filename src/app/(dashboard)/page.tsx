@@ -9,18 +9,21 @@ import {
 } from "lucide-react";
 import { getDashboardStats } from "@/lib/actions";
 import Link from "next/link";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export default async function Dashboard() {
   const data = await getDashboardStats();
   
+  if (!data) return null;
+
   const stats = [
-    { title: "Recaudación Realizada", value: `S/ ${data?.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 }) || "0.00"}`, desc: "FLUJO TOTAL" },
-    { title: "Entidades Activas", value: data?.totalCustomers.toString() || "0", desc: "CLIENTES" },
-    { title: "Vínculos Activos", value: data?.activeSubscriptions.toString() || "0", desc: "CONTRATOS + SUBS" },
-    { title: "Gestión Integrada", value: data?.totalServices.toString() || "0", desc: "SERVICIOS TOT." },
+    { title: "Recaudación Realizada", value: `S/ ${data.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 }) || "0.00"}`, desc: "FLUJO TOTAL" },
+    { title: "Entidades Activas", value: data.totalCustomers.toString() || "0", desc: "CLIENTES" },
+    { title: "Vínculos Activos", value: data.activeSubscriptions.toString() || "0", desc: "CONTRATOS + SUBS" },
+    { title: "Gestión Integrada", value: data.totalServices.toString() || "0", desc: "SERVICIOS TOT." },
   ];
 
-  const recentActivity = data?.recentActivity || [];
+  const recentActivity = data.recentActivity || [];
 
   return (
     <div className="flex flex-col gap-6 select-none animate-in fade-in duration-500">
@@ -107,6 +110,9 @@ export default async function Dashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Analytics Charts */}
+      <DashboardCharts data={data.chartData} />
     </div>
   )
 }
