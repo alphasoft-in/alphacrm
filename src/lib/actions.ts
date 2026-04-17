@@ -567,3 +567,70 @@ export async function deletePettyCashMovement(id: string) {
     return { success: true };
   } catch (e: any) { return { success: false, error: e.message }; }
 }
+
+// --- MONTHLY CLOSING ---
+export async function getMonthlyClosings() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return [];
+  const sql = neon(dbUrl);
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS "MonthlyClosing" (
+        id TEXT PRIMARY KEY,
+        period TEXT NOT NULL UNIQUE, -- "MM-YYYY"
+        "grossIncome" DECIMAL(12,2) NOT NULL,
+        "totalExpenses" DECIMAL(12,2) NOT NULL,
+        "netBalance" DECIMAL(12,2) NOT NULL,
+        "pendingDebt" DECIMAL(12,2) NOT NULL,
+        "closedBy" TEXT,
+        status TEXT DEFAULT 'CLOSED',
+        "closedAt" TIMESTAMP DEFAULT NOW()
+      )
+    `;
+    return await sql`SELECT * FROM "MonthlyClosing" ORDER BY "closedAt" DESC`;
+  } catch (e) { return []; }
+}
+
+export async function performMonthlyClosing(period: string, closedBy: string) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return { success: false };
+  const sql = neon(dbUrl);
+  
+  try {
+    const [month, year] = period.split("-");
+    const startDate = new Date(parseInt(year), parseInt(month) - 1, 1).toISOString();
+    const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59).toISOString();
+
+    const stats = await Promise.all([
+      sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED' AND "paymentDate" BETWEEN ${startDate} AND ${endDate}`,
+      sql`SELECT SUM(amount) as total FROM "PettyCash" WHERE type = 'EXPENSE' AND date BETWEEN ${startDate} AND ${endDate}`,
+      sql`
+        SELECT SUM("totalAmount") - COALESCE(SUM((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED')), 0) as pending
+        FROM "Deal" d WHERE status != 'CANCELLED'
+      `
+    ]);
+    
+    const grossIncome = parseFloat(stats[0][0].total || 0);
+    const totalExpenses = parseFloat(stats[1][0].total || 0);
+    const netBalance = grossIncome - totalExpenses;
+    const pendingDebt = parseFloat(stats[2][0].pending || 0);
+
+    const id = crypto.randomUUID();
+    await sql`
+      INSERT INTO "MonthlyClosing" (id, period, "grossIncome", "totalExpenses", "netBalance", "pendingDebt", "closedBy", "closedAt")
+      VALUES (${id}, ${period}, ${grossIncome}, ${totalExpenses}, ${netBalance}, ${pendingDebt}, ${closedBy}, NOW())
+      ON CONFLICT (period) DO UPDATE SET 
+        "grossIncome" = EXCLUDED."grossIncome",
+        "totalExpenses" = EXCLUDED."totalExpenses",
+        "netBalance" = EXCLUDED."netBalance",
+        "pendingDebt" = EXCLUDED."pendingDebt",
+        "closedBy" = EXCLUDED."closedBy",
+        "closedAt" = NOW()
+    `;
+
+    revalidatePath("/reports");
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
+}

@@ -14,8 +14,9 @@ import {
   ArrowRight,
   TrendingUp as ProfitIcon,
   Search,
-  CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  Archive
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,17 +38,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Fragment } from "react";
 import { toast } from "sonner";
-import { getPayments, getPettyCashMovements, getSubscriptions, getDeals } from "@/lib/actions";
+import { getPayments, getPettyCashMovements, getSubscriptions, getDeals, getMonthlyClosings, performMonthlyClosing } from "@/lib/actions";
 
 export default function ReportsPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [movements, setMovements] = useState<any[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
+  const [closings, setClosings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("all"); 
   const [searchTerm, setSearchTerm] = useState("");
-  const [reportMode, setReportMode] = useState<"consolidated" | "detailed">("detailed");
+  const [reportMode, setReportMode] = useState<"consolidated" | "detailed" | "closings">("detailed");
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -55,16 +57,18 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [payData, movData, subData, dealData] = await Promise.all([
+      const [payData, movData, subData, dealData, closingData] = await Promise.all([
         getPayments(),
         getPettyCashMovements(),
         getSubscriptions(),
-        getDeals()
+        getDeals(),
+        getMonthlyClosings()
       ]);
       setPayments(payData);
       setMovements(movData);
       setSubscriptions(subData);
       setDeals(dealData);
+      setClosings(closingData);
       setCurrentPage(1);
       setLoading(false);
     };
@@ -123,7 +127,24 @@ export default function ReportsPage() {
 
   const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
   const paginatedActivities = filteredActivities.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const handlePerformClosing = async () => {
+    const now = new Date();
+    const periodStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()}`;
+    
+    if (!confirm(`¿Estás seguro de realizar el cierre del mes ${periodStr}? Esto generará un registro inalterable de los movimientos actuales.`)) return;
 
+    setLoading(true);
+    const res = await performMonthlyClosing(periodStr, "ADMINISTRADOR");
+    if (res.success) {
+      toast.success("Cierre de mes realizado correctamente");
+      const closingData = await getMonthlyClosings();
+      setClosings(closingData);
+      setReportMode("closings");
+    } else {
+      toast.error("Error al realizar el cierre: " + res.error);
+    }
+    setLoading(false);
+  };
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, period]);
@@ -338,6 +359,12 @@ export default function ReportsPage() {
             >
               Detallado
             </button>
+            <button 
+              onClick={() => setReportMode('closings')}
+              className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${reportMode === 'closings' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400 hover:text-zinc-600'}`}
+            >
+              Cierres Mensuales
+            </button>
           </div>
         </div>
         
@@ -371,25 +398,106 @@ export default function ReportsPage() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button 
-            variant="outline" 
-            onClick={handleExport}
-            className="h-10 border-zinc-100 bg-white text-zinc-600 rounded-xl text-[10px] font-semibold uppercase tracking-widest px-6 shadow-none"
-          >
-            <Download size={14} className="mr-2" /> Exportar Excel
-          </Button>
+          {reportMode === 'closings' ? (
+             <Button 
+                onClick={handlePerformClosing}
+                className="h-10 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] font-semibold uppercase tracking-widest px-8 shadow-none border-none transition-all active:scale-95 gap-2"
+              >
+                <Lock size={14} /> Ejecutar Cierre {new Date().toLocaleDateString('es-PE', { month: 'long', year: 'numeric' })}
+             </Button>
+          ) : (
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleExport}
+                className="h-10 border-zinc-100 bg-white text-zinc-600 rounded-xl text-[10px] font-semibold uppercase tracking-widest px-6 shadow-none"
+              >
+                <Download size={14} className="mr-2" /> Exportar Excel
+              </Button>
 
-          <Button 
-            onClick={handlePrint}
-            className="h-10 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] font-semibold uppercase tracking-widest px-6 shadow-none border-none transition-all active:scale-95"
-          >
-            <FileText size={14} className="mr-2 text-white/70" /> Vista Impresión
-          </Button>
+              <Button 
+                onClick={handlePrint}
+                className="h-10 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] font-semibold uppercase tracking-widest px-6 shadow-none border-none transition-all active:scale-95"
+              >
+                <FileText size={14} className="mr-2 text-white/70" /> Vista Impresión
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
       {/* METRICAS Y TABLAS DINAMICAS */}
-      {reportMode === 'consolidated' ? (
+      {reportMode === 'closings' ? (
+        <Card className="border-zinc-100 shadow-none rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 border">
+          <CardHeader className="bg-white border-b border-zinc-50 py-6 px-8 flex flex-row items-center justify-between">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-none">Historial de Auditoría</span>
+              <CardTitle className="text-xl font-bold text-zinc-900 tracking-tight uppercase">Cierres Mensuales Realizados</CardTitle>
+            </div>
+            <Archive className="text-zinc-200" size={32} />
+          </CardHeader>
+          <CardContent className="p-0">
+             <Table>
+                <TableHeader className="bg-zinc-50/50">
+                   <TableRow className="border-zinc-100">
+                      <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4 pl-8">Periodo</TableHead>
+                      <TableHead className="text-[10px] font-bold uppercase tracking-widest text-center">Ingresos</TableHead>
+                      <TableHead className="text-[10px] font-bold uppercase tracking-widest text-center">Egresos</TableHead>
+                      <TableHead className="text-[10px] font-bold uppercase tracking-widest text-center">Balance Neto</TableHead>
+                      <TableHead className="text-[10px] font-bold uppercase tracking-widest text-right pr-8">Cartera (Deuda)</TableHead>
+                   </TableRow>
+                </TableHeader>
+                <TableBody>
+                   {loading ? (
+                      <TableRow>
+                         <TableCell colSpan={5} className="h-40 text-center text-[10px] font-bold text-zinc-300 uppercase tracking-widest animate-pulse">
+                            Consultando archivos históricos...
+                         </TableCell>
+                      </TableRow>
+                   ) : closings.length === 0 ? (
+                      <TableRow>
+                         <TableCell colSpan={5} className="h-40 text-center flex flex-col items-center justify-center gap-3">
+                            <Archive size={24} className="text-zinc-200" />
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">No se han realizado cierres mensuales aún</p>
+                         </TableCell>
+                      </TableRow>
+                   ) : closings.map((closing) => (
+                      <TableRow key={closing.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors group">
+                         <TableCell className="py-5 pl-8 font-bold text-zinc-900 uppercase tracking-tighter">
+                            <div className="flex items-center gap-3">
+                               <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-[10px]">
+                                  {closing.period.split('-')[0]}
+                               </div>
+                               <div className="flex flex-col leading-none">
+                                  <span className="text-xs">{closing.period}</span>
+                                  <span className="text-[8px] text-zinc-400 mt-1 uppercase tracking-widest">Cerrado el {new Date(closing.closedAt).toLocaleDateString()}</span>
+                               </div>
+                            </div>
+                         </TableCell>
+                         <TableCell className="text-center">
+                            <span className="text-[11px] font-bold text-emerald-600 tracking-tight">S/ {parseFloat(closing.grossIncome).toFixed(2)}</span>
+                         </TableCell>
+                         <TableCell className="text-center">
+                            <span className="text-[11px] font-bold text-rose-600 tracking-tight">S/ {parseFloat(closing.totalExpenses).toFixed(2)}</span>
+                         </TableCell>
+                         <TableCell className="text-center">
+                            <Badge className="bg-zinc-900 text-white hover:bg-zinc-800 border-none text-[10px] font-bold tracking-tight px-3 py-1">
+                               S/ {parseFloat(closing.netBalance).toFixed(2)}
+                            </Badge>
+                         </TableCell>
+                         <TableCell className="text-right pr-8">
+                            <div className="flex flex-col items-end">
+                               <span className="text-[11px] font-bold text-zinc-950 tracking-tight">S/ {parseFloat(closing.pendingDebt).toFixed(2)}</span>
+                               <span className="text-[8px] text-zinc-400 uppercase tracking-widest mt-1">Snapshot de Cobranza</span>
+                            </div>
+                         </TableCell>
+                      </TableRow>
+                   ))}
+                </TableBody>
+             </Table>
+          </CardContent>
+        </Card>
+      ) : reportMode === 'consolidated' ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border-zinc-100 bg-zinc-50 shadow-none rounded-2xl overflow-hidden relative group border">
