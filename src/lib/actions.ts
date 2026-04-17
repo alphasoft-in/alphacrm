@@ -488,6 +488,29 @@ export async function getGlobalActivity() {
           "createdAt" as "timestamp",
           amount
         FROM "PettyCash"
+
+        UNION ALL
+
+        SELECT id,
+          'NUEVO CONTRATO' as "customerName",
+          name as "serviceName",
+          "dealDate" as "date",
+          'NEW_DEAL' as "type",
+          "createdAt" as "timestamp",
+          "totalAmount" as "amount"
+        FROM "Deal"
+
+        UNION ALL
+
+        SELECT s.id,
+          'NUEVA SUSCRIPCIÓN' as "customerName",
+          ser.name as "serviceName",
+          "startDate" as "date",
+          'NEW_SUBSCRIPTION' as "type",
+          s."createdAt" as "timestamp",
+          s.price as "amount"
+        FROM "Subscription" s
+        JOIN "Service" ser ON s."serviceId" = ser.id
       ) AS combined
       ORDER BY "timestamp" DESC
       LIMIT 15

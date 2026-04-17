@@ -110,9 +110,19 @@ export function Notifications() {
                     Transacciones Recientes
                   </div>
                   {activity.map((act) => (
-                    <DropdownMenuItem key={act.id} className="px-5 py-3 cursor-pointer hover:bg-zinc-50 transition-colors border-none group">
+                    <DropdownMenuItem 
+                      key={act.id} 
+                      className="px-5 py-3 cursor-pointer hover:bg-zinc-50 transition-colors border-none group"
+                      onClick={() => {
+                        let target = '/reports';
+                        if (act.type === 'INCOME' || act.type === 'EXPENSE') target = '/petty-cash';
+                        if (act.type === 'NEW_DEAL') target = '/contracts';
+                        if (act.type === 'NEW_SUBSCRIPTION') target = '/subscriptions';
+                        handleNotificationClick(target);
+                      }}
+                    >
                        <div className="flex gap-4 items-start w-full">
-                          <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${act.type === 'INCOME' || act.type === 'PAYMENT' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                          <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${act.type === 'INCOME' || act.type === 'PAYMENT' || act.type === 'NEW_DEAL' || act.type === 'NEW_SUBSCRIPTION' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                           <div className="flex flex-col flex-1 gap-1">
                              <div className="flex items-center justify-between">
                                 <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
