@@ -60,9 +60,9 @@ export function Notifications() {
         <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-zinc-900 transition-colors">
           <Bell size={20} />
           {(renewals.length + activity.length) > 0 && (
-            <span className="absolute top-2 right-2 flex h-4 w-4">
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-900 opacity-20"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-zinc-900 text-[9px] text-white font-bold items-center justify-center border border-white">
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-zinc-900 text-[8px] text-white font-bold items-center justify-center border-2 border-white">
                 {renewals.length + activity.length}
               </span>
             </span>
@@ -81,7 +81,7 @@ export function Notifications() {
              <div className="p-10 flex items-center justify-center text-[9px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">
                 Sincronizando Alertas...
              </div>
-          ) : renewals.length === 0 ? (
+          ) : (renewals.length === 0 && activity.length === 0) ? (
              <div className="p-10 flex flex-col items-center justify-center text-center gap-3">
                 <div className="w-10 h-10 bg-zinc-50 rounded-full flex items-center justify-center">
                    <CheckCircle2 size={16} className="text-zinc-200" />
