@@ -15,6 +15,7 @@ import {
   TrendingUp as ProfitIcon,
   Search,
   AlertCircle,
+  CheckCircle2,
   Lock,
   Archive
 } from "lucide-react";
