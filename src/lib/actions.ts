@@ -385,42 +385,42 @@ export async function getDashboardStats() {
       // Nueva consulta para datos de gráficos (últimos 6 meses)
       sql`
         SELECT 
-          TO_CHAR("paymentDate", 'Mon') as month,
+          EXTRACT(MONTH FROM "paymentDate") as month_num,
           SUM(amount) as total
         FROM "Payment"
         WHERE status = 'COMPLETED' AND "paymentDate" >= NOW() - INTERVAL '6 months'
-        GROUP BY TO_CHAR("paymentDate", 'Mon'), EXTRACT(MONTH FROM "paymentDate")
-        ORDER BY EXTRACT(MONTH FROM "paymentDate")
+        GROUP BY month_num
+        ORDER BY month_num
       `,
       sql`
         SELECT 
-          TO_CHAR(date, 'Mon') as month,
+          EXTRACT(MONTH FROM date) as month_num,
           SUM(amount) as total
         FROM "PettyCash"
         WHERE type = 'EXPENSE' AND date >= NOW() - INTERVAL '6 months'
-        GROUP BY TO_CHAR(date, 'Mon'), EXTRACT(MONTH FROM date)
-        ORDER BY EXTRACT(MONTH FROM date)
+        GROUP BY month_num
+        ORDER BY month_num
       `
     ]);
 
-    // Combinar datos de ingresos y gastos por mes
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const currentMonth = new Date().getMonth();
+    const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-11
     const last6Months = [];
+    
     for (let i = 5; i >= 0; i--) {
-      const mIdx = (currentMonth - i + 12) % 12;
-      last6Months.push(months[mIdx]);
-    }
-
-    const chartData = last6Months.map(m => {
-      const rev = stats[5].find((r: any) => r.month === m);
-      const exp = stats[6].find((e: any) => e.month === m);
-      return {
-        month: m.toUpperCase(),
+      const targetMonthIdx = (currentMonth - i + 12) % 12;
+      const targetMonthNum = targetMonthIdx + 1; // 1-12
+      
+      const rev = stats[5].find((r: any) => parseInt(r.month_num) === targetMonthNum);
+      const exp = stats[6].find((e: any) => parseInt(e.month_num) === targetMonthNum);
+      
+      last6Months.push({
+        month: monthNames[targetMonthIdx],
         ingresos: parseFloat(rev?.total || 0),
         egresos: parseFloat(exp?.total || 0)
-      };
-    });
+      });
+    }
 
     return {
       totalCustomers: parseInt(stats[0][0].count),
@@ -428,7 +428,7 @@ export async function getDashboardStats() {
       activeSubscriptions: parseInt(stats[2][0].count),
       totalRevenue: parseFloat(stats[3][0].total || 0),
       recentActivity: stats[4],
-      chartData: chartData
+      chartData: last6Months
     };
   } catch (e) { return null; }
 }
