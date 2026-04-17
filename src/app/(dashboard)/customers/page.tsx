@@ -387,11 +387,11 @@ export default function CustomersPage() {
       <Card className="border-zinc-200 bg-white shadow-sm overflow-hidden rounded-2xl">
         <CardHeader className="p-4 border-b border-zinc-100">
           <div className="flex items-center gap-3">
-             <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+             <div className="relative flex-1 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
                 <Input 
                   placeholder="Búsqueda dinámica..." 
-                  className="pl-9 h-10 border-none bg-zinc-50/50 text-xs font-semibold"
+                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
                 />
              </div>
              <Button variant="outline" className="h-10 border-zinc-200 text-zinc-500 font-semibold px-4 gap-2">

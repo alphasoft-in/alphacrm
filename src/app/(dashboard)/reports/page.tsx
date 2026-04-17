@@ -331,14 +331,14 @@ export default function ReportsPage() {
         </div>
         
         <div className="flex gap-3 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+          <div className="relative flex-1 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
             <input 
               type="text"
               placeholder="BUSCAR CLIENTE, CATEGORÍA O DOCUMENTO..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-10 pl-9 pr-4 border border-zinc-100 bg-white text-zinc-600 rounded-xl text-[10px] font-semibold uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-zinc-200 w-full shadow-none transition-all"
+              className="h-10 pl-9 pr-4 border border-zinc-200 bg-white text-zinc-600 rounded-xl text-[10px] font-semibold uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-zinc-900 w-full shadow-none transition-all"
             />
           </div>
 

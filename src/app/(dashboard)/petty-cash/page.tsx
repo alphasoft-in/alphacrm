@@ -482,15 +482,15 @@ export default function PettyCashPage() {
 
       <Card className="border-zinc-100 bg-white overflow-hidden rounded-2xl border-zinc-100 shadow-none">
          <CardHeader className="p-5 border-b border-zinc-100 flex flex-row items-center justify-between space-y-0">
-            <div className="relative w-full max-w-sm">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
-               <Input 
-                 placeholder="Búsqueda dinámica..." 
-                 value={search}
-                 onChange={e => setSearch(e.target.value)}
-                 className="pl-9 h-10 border border-zinc-200/50 bg-zinc-50/10 text-xs font-semibold tracking-tight rounded-xl"
-               />
-            </div>
+             <div className="relative w-full max-w-sm group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
+                <Input 
+                  placeholder="Búsqueda dinámica..." 
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/10 text-xs font-semibold tracking-tight rounded-xl focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all"
+                />
+             </div>
             <div className="flex gap-2">
                <Button variant="outline" className="h-10 border-zinc-200 text-zinc-600 rounded-xl text-xs font-medium px-4">
                   <Filter size={14} className="mr-2" /> Filtros
