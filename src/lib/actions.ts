@@ -400,7 +400,7 @@ export async function getDashboardStats() {
         WHERE type = 'EXPENSE' AND date >= NOW() - INTERVAL '6 months'
         GROUP BY month_num
         ORDER BY month_num
-      `
+      `,
       sql`
         SELECT SUM("totalAmount") - COALESCE(SUM((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED')), 0) as pending
         FROM "Deal" d
