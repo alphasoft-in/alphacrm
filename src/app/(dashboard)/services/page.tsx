@@ -25,7 +25,9 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
+import { Filter, Zap, LayoutGrid, CheckCircle2, History } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -58,6 +60,8 @@ export default function ServicesPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -162,22 +166,41 @@ export default function ServicesPage() {
     }
   };
 
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+  const paginatedServices = filteredServices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  // Cálculos para los Cards
+  const totalServices = services.length;
+  const availableServices = services.length; // Por ahora todos son disponibles
+  const availabilityRate = totalServices > 0 ? (availableServices / totalServices) * 100 : 100;
+  
+  const lastUpdate = services.length > 0 
+    ? new Date(Math.max(...services.map(s => new Date(s.updatedAt || s.createdAt).getTime())))
+    : new Date();
+
   return (
-    <div className="flex flex-col gap-6 pb-10">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+      <header className="flex items-center justify-between border-l-[3px] border-zinc-900 pl-4 py-0.5">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Catálogo de Servicios</h1>
-          <p className="text-zinc-500">Define y administra los servicios que ofreces a tus clientes.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-900 uppercase">Catálogo de Servicios</h1>
+          <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-[0.2em] leading-none mt-1">Estructura Comercial • Gestión de Productos</p>
         </div>
         
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleOpenNew} className="bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-sm h-9 px-4 font-bold uppercase text-[10px] tracking-wider">
-              <Plus size={16} />
+            <Button onClick={handleOpenNew} className="bg-zinc-900 hover:bg-black text-white font-semibold h-10 px-6 rounded-xl text-xs uppercase tracking-widest shadow-sm transition-all">
+              <Plus size={16} className="mr-2" />
               Nuevo Servicio
             </Button>
           </DialogTrigger>
-          <DialogContent className="border-zinc-200 bg-white text-zinc-950 shadow-2xl sm:max-w-[600px] p-0 overflow-hidden rounded-xl">
+          <DialogContent 
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            className="border-zinc-200 bg-white text-zinc-950 shadow-2xl sm:max-w-[600px] p-0 overflow-hidden rounded-2xl"
+          >
             <DialogHeader className="p-6 pb-2">
               <DialogTitle className="text-xl text-zinc-900">
                 {isEditing ? "Editar Servicio" : "Nuevo Servicio"}
@@ -266,54 +289,71 @@ export default function ServicesPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-         <Card className="border-zinc-200 bg-white shadow-sm border-t-4 border-t-blue-500">
-            <CardHeader className="pb-2">
-               <CardTitle className="text-sm font-medium text-zinc-500 flex items-center gap-2">
-                  <Layers size={16} /> Total Servicios
-                </CardTitle>
+         <Card className="border-zinc-200 bg-white shadow-sm rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <LayoutGrid className="w-16 h-16 text-zinc-900" />
+            </div>
+            <CardHeader className="pb-2 pt-4 px-5">
+               <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-zinc-900 rounded-full" />
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Capacidad Total</span>
+               </div>
             </CardHeader>
-            <CardContent>
-               <div className="text-2xl font-bold text-zinc-900">{services.length}</div>
-               <p className="text-xs text-zinc-400">Servicios activos en catálogo</p>
+            <CardContent className="px-5 pb-5">
+               <div className="text-3xl font-bold text-zinc-900 tracking-tighter">{totalServices}</div>
+               <p className="text-[9px] text-zinc-400 font-semibold uppercase mt-1">Servicios activos en portafolio</p>
             </CardContent>
          </Card>
-         <Card className="border-zinc-200 bg-white shadow-sm border-t-4 border-t-emerald-500">
-            <CardHeader className="pb-2">
-               <CardTitle className="text-sm font-medium text-zinc-500 flex items-center gap-2">
-                  <ShieldCheck size={16} /> Disponibilidad
-                </CardTitle>
+
+         <Card className="border-zinc-200 bg-white shadow-sm rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <CheckCircle2 className="w-16 h-16 text-zinc-900" />
+            </div>
+            <CardHeader className="pb-2 pt-4 px-5">
+               <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Disponibilidad</span>
+               </div>
             </CardHeader>
-            <CardContent>
-               <div className="text-xl font-bold text-zinc-900 truncate">SLA 99.9%</div>
-               <p className="text-xs text-emerald-600">Servicios operativos</p>
+            <CardContent className="px-5 pb-5">
+               <div className="text-3xl font-bold text-zinc-900 tracking-tighter">{availabilityRate}%</div>
+               <p className="text-[9px] text-emerald-600 font-bold uppercase mt-1 tracking-tight">SLA OPERATIVO ÓPTIMO</p>
             </CardContent>
          </Card>
-         <Card className="border-zinc-200 bg-white shadow-sm border-t-4 border-t-indigo-500">
-            <CardHeader className="pb-2">
-               <CardTitle className="text-sm font-medium text-zinc-500 flex items-center gap-2">
-                  <Clock size={16} /> Última Actualización
-                </CardTitle>
+
+         <Card className="border-zinc-200 bg-zinc-900 shadow-xl rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <History className="w-16 h-16 text-white" />
+            </div>
+            <CardHeader className="pb-2 pt-4 px-5">
+               <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sincronización</span>
+               </div>
             </CardHeader>
-            <CardContent>
-               <div className="text-2xl font-bold text-zinc-900">Hoy</div>
-               <p className="text-xs text-zinc-400">Catálogo sincronizado</p>
+            <CardContent className="px-5 pb-5">
+               <div className="text-2xl font-bold text-white tracking-tighter uppercase">
+                 {lastUpdate.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
+               </div>
+               <p className="text-[9px] text-zinc-400 font-semibold uppercase mt-1 tracking-widest">Última actualización de catálogo</p>
             </CardContent>
          </Card>
       </div>
 
-      <Card className="border-zinc-200 bg-white shadow-sm">
-        <CardHeader className="pb-3 border-b border-zinc-50">
-          <div className="flex items-center gap-4">
-             <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
-                <Input 
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Buscar servicios por nombre o descripción..." 
-                  className="pl-10 border-zinc-200 bg-zinc-50/50 outline-none"
-                />
-             </div>
+      <Card className="border-zinc-200 bg-white shadow-sm overflow-hidden rounded-2xl mt-2">
+        <CardHeader className="p-4 border-b border-zinc-100 flex flex-row items-center justify-between space-y-0 gap-4">
+          <div className="relative group flex-1">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
+             <Input 
+               value={search}
+               onChange={e => setSearch(e.target.value)}
+               placeholder="Buscar servicios por nombre o descripción..." 
+               className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
+             />
           </div>
+          <Button variant="outline" className="h-10 border-zinc-200 text-zinc-600 rounded-xl text-xs font-medium px-4">
+             <Filter size={14} className="mr-2" /> Filtros
+          </Button>
         </CardHeader>
         <CardContent className="pt-6">
           <Table>
@@ -343,7 +383,7 @@ export default function ServicesPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredServices.map((service) => (
+                paginatedServices.map((service) => (
                   <TableRow key={service.id} className="border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <TableCell className="font-medium text-zinc-900">
                       <div className="flex items-center gap-2">
@@ -403,6 +443,11 @@ export default function ServicesPage() {
               )}
             </TableBody>
           </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 
