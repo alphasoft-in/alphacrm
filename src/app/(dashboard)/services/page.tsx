@@ -391,15 +391,15 @@ export default function ServicesPage() {
                            <Package size={14} />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-bold text-zinc-900 uppercase tracking-tight">{service.name}</span>
+                          <span className="text-[11px] font-medium text-zinc-900 uppercase tracking-tight">{service.name}</span>
                           <span className="text-[8px] text-zinc-400 font-medium uppercase tracking-widest mt-0.5">{service.id}</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-zinc-900">
+                    <TableCell className="font-medium text-zinc-900">
                       <div className="flex flex-col">
                         <span className="text-[11px]">S/ {service.basePrice.toFixed(2)}</span>
-                        <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">
+                        <span className="text-[8px] text-zinc-400 font-medium uppercase tracking-widest mt-0.5">
                           {service.taxStatus === 'INC_IGV' ? 'Inc. IGV' : service.taxStatus === 'PLUS_IGV' ? '+ IGV' : 'Sin IGV'}
                         </span>
                       </div>
@@ -408,7 +408,7 @@ export default function ServicesPage() {
                       <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-tight">{getCycleText(service.billingCycle)}</span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="border-zinc-100 bg-white text-zinc-400 text-[8px] font-bold uppercase tracking-widest px-2 py-0">
+                      <Badge variant="outline" className="border-zinc-100 bg-white text-zinc-400 text-[8px] font-medium uppercase tracking-widest px-2 py-0">
                         Disponible
                       </Badge>
                     </TableCell>
