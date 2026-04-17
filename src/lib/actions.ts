@@ -733,16 +733,19 @@ export async function getAccountsReceivable() {
   try {
     const receivables = await sql`
       SELECT * FROM (
+        -- Deuda de Contratos (Deals)
+        -- Restamos la inicial (downPayment) y los pagos registrados
         SELECT d.id, c.name as "customerName", d.name as "description", 
-          d."totalAmount" - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0) as balance,
+          d."totalAmount" - d."downPayment" - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0) as balance,
           d."dealDate" as "date",
           'DEAL' as source
         FROM "Deal" d
         JOIN "Customer" c ON d."customerId" = c.id
-        WHERE d.status != 'CANCELLED'
+        WHERE (d.status = 'OPEN' OR d.status = 'IN_PROGRESS' OR d.status = 'active')
         
         UNION ALL
 
+        -- Deuda de Suscripciones (Próximos 45 días o vencidas)
         SELECT s.id, c.name as "customerName", ser.name as "description",
           s.price as balance,
           s."nextRenewal" as "date",
@@ -750,7 +753,8 @@ export async function getAccountsReceivable() {
         FROM "Subscription" s
         JOIN "Customer" c ON s."customerId" = c.id
         JOIN "Service" ser ON s."serviceId" = ser.id
-        WHERE (s.status = 'ACTIVE' OR s.status = 'active') AND s."nextRenewal" <= NOW()
+        WHERE (s.status = 'ACTIVE' OR s.status = 'active') 
+        AND (s."nextRenewal" IS NULL OR s."nextRenewal" <= NOW() + INTERVAL '45 days')
       ) AS combined
       WHERE balance > 0
       ORDER BY "date" ASC
