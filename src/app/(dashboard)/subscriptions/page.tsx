@@ -570,7 +570,7 @@ export default function SubscriptionsPage() {
               ) : paginatedSubs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">
-                    Sin registros en base
+                    No se encontraron Suscripciones
                   </TableCell>
                 </TableRow>
               ) : paginatedSubs.map(sub => (
