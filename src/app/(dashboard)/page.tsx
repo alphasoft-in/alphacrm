@@ -26,7 +26,7 @@ export default async function Dashboard() {
     <div className="flex flex-col gap-6 select-none animate-in fade-in duration-500">
       {/* Structural Header */}
       <header className="flex flex-col gap-1 border-l-[3px] border-zinc-900 pl-4 py-0.5">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 uppercase">Sala de Control Alpha</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 uppercase">Dashboard</h1>
         <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-[0.2em] leading-none">Centro de Inteligencia • Sincronización en Tiempo Real</p>
       </header>
 
