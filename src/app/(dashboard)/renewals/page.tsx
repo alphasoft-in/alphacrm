@@ -265,7 +265,7 @@ export default function RenewalsPage() {
               ) : filteredRenewals.map((item) => {
                 const urgency = calculateUrgency(item.nextRenewal);
                 return (
-                  <TableRow key={item.id} className="border-zinc-100 transition-colors uppercase">
+                  <TableRow key={item.id} className="border-zinc-100 transition-colors uppercase hover:bg-transparent">
                     <TableCell className="py-4 pl-6">
                       <div className="flex items-center gap-3">
                          <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
