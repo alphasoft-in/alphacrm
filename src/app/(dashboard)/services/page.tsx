@@ -359,11 +359,11 @@ export default function ServicesPage() {
           <Table>
             <TableHeader className="bg-zinc-50/50 rounded-t-lg">
               <TableRow className="hover:bg-transparent border-zinc-100">
-                <TableHead className="text-zinc-500 font-semibold">Servicio</TableHead>
-                <TableHead className="text-zinc-500 font-semibold">Precio Base</TableHead>
-                <TableHead className="text-zinc-500 font-semibold">Facturación</TableHead>
-                <TableHead className="text-zinc-500 font-semibold">Estado</TableHead>
-                <TableHead className="text-right text-zinc-500 font-semibold">Acciones</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest py-4 pl-6 text-zinc-500">Servicio</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Precio Base</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Facturación</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Estado</TableHead>
+                <TableHead className="text-right text-[10px] font-semibold uppercase tracking-widest pr-6 text-zinc-500">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -387,28 +387,28 @@ export default function ServicesPage() {
                   <TableRow key={service.id} className="border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <TableCell className="font-medium text-zinc-900">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-md bg-blue-50 text-blue-600">
-                           <Package size={16} />
+                        <div className="p-1.5 rounded-md bg-zinc-50 text-zinc-400">
+                           <Package size={14} />
                         </div>
                         <div className="flex flex-col">
-                          <span>{service.name}</span>
-                          <span className="text-[10px] text-zinc-400">{service.id}</span>
+                          <span className="text-[11px] font-bold text-zinc-900 uppercase tracking-tight">{service.name}</span>
+                          <span className="text-[8px] text-zinc-400 font-medium uppercase tracking-widest mt-0.5">{service.id}</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-zinc-900 text-sm">
+                    <TableCell className="font-bold text-zinc-900">
                       <div className="flex flex-col">
-                        <span>S/ {service.basePrice.toFixed(2)}</span>
-                        <span className="text-[9px] text-zinc-400 font-medium uppercase">
+                        <span className="text-[11px]">S/ {service.basePrice.toFixed(2)}</span>
+                        <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">
                           {service.taxStatus === 'INC_IGV' ? 'Inc. IGV' : service.taxStatus === 'PLUS_IGV' ? '+ IGV' : 'Sin IGV'}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-zinc-500">{getCycleText(service.billingCycle)}</span>
+                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-tight">{getCycleText(service.billingCycle)}</span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
+                      <Badge variant="outline" className="border-zinc-100 bg-white text-zinc-400 text-[8px] font-bold uppercase tracking-widest px-2 py-0">
                         Disponible
                       </Badge>
                     </TableCell>
