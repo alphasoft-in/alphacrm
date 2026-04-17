@@ -442,8 +442,8 @@ export default function CustomersPage() {
                 </TableRow>
               ) : dbCustomers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase">
-                    No existen registros en el sistema.
+                  <TableCell colSpan={5} className="h-32 text-center text-[11px] font-semibold text-zinc-300 tracking-tight">
+                    No se encontraron Clientes registrados
                   </TableCell>
                 </TableRow>
               ) : (

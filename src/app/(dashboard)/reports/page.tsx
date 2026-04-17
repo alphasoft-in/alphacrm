@@ -462,7 +462,7 @@ export default function ReportsPage() {
                   {paginatedActivities.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="h-64 text-center">
-                        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Sin actividad registrada en este período</p>
+                        <p className="text-zinc-300 text-[11px] font-bold tracking-tight">No se encontraron actividades registradas</p>
                       </TableCell>
                     </TableRow>
                   ) : (

@@ -569,7 +569,7 @@ export default function SubscriptionsPage() {
                 </TableRow>
               ) : paginatedSubs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">
+                  <TableCell colSpan={6} className="h-32 text-center text-[11px] font-semibold text-zinc-300 tracking-tight">
                     No se encontraron Suscripciones
                   </TableCell>
                 </TableRow>

@@ -500,7 +500,9 @@ export default function PaymentsPage() {
                 </TableRow>
               ) : filteredPayments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Sincronizando caja de pagos...</TableCell>
+                  <TableCell colSpan={6} className="h-32 text-center text-[11px] font-semibold text-zinc-300 tracking-tight">
+                    No se encontraron Pagos registrados
+                  </TableCell>
                 </TableRow>
               ) : paginatedPayments.map((payment) => (
                 <TableRow key={payment.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors uppercase">

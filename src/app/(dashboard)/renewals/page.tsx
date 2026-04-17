@@ -268,7 +268,9 @@ export default function RenewalsPage() {
                 </TableRow>
               ) : filteredRenewals.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Analizando ciclos...</TableCell>
+                  <TableCell colSpan={6} className="h-32 text-center text-[11px] font-semibold text-zinc-300 tracking-tight">
+                    No se encontraron Renovaciones pendientes
+                  </TableCell>
                 </TableRow>
               ) : paginatedRenewals.map((item) => {
                 const urgency = calculateUrgency(item.nextRenewal);

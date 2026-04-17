@@ -591,7 +591,9 @@ export default function ContractsPage() {
                 </TableRow>
               ) : paginatedDeals.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">Sin registros en base</TableCell>
+                  <TableCell colSpan={4} className="h-32 text-center text-[11px] font-semibold text-zinc-300 tracking-tight">
+                    No se encontraron Contratos registrados
+                  </TableCell>
                 </TableRow>
               ) : paginatedDeals.map((deal) => {
                 const paid = parseFloat(deal.paidAmount || 0);
