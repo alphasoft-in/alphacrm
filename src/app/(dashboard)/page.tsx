@@ -60,9 +60,6 @@ export default async function Dashboard() {
               <div className="w-1.5 h-1.5 bg-zinc-950 rounded-full animate-pulse" />
               <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-900">Monitor de Rendimiento</span>
             </div>
-            <div className="bg-zinc-50 px-3 py-1 rounded-full border border-zinc-100">
-               <span className="text-[9px] font-bold text-zinc-500 uppercase">Salud del Ecosistema: <span className="text-zinc-900">Óptima</span></span>
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-8 relative z-10 mt-6">
