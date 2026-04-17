@@ -358,7 +358,6 @@ export async function getDealsByCustomer(customerId: string) {
     `; 
   } catch (e) { return []; }
 }
-
 export async function getDashboardStats() {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) return null;
@@ -405,7 +404,9 @@ export async function getDashboardStats() {
         SELECT SUM("totalAmount") - COALESCE(SUM((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED')), 0) as pending
         FROM "Deal" d
         WHERE status != 'CANCELLED'
-      `
+      `,
+      // Gastos totales históricos
+      sql`SELECT SUM(amount) as total FROM "PettyCash" WHERE type = 'EXPENSE'`
     ]);
 
     const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
@@ -427,11 +428,15 @@ export async function getDashboardStats() {
       });
     }
 
+    const grossRevenue = parseFloat(stats[3][0].total || 0);
+    const totalExpenses = parseFloat(stats[8][0].total || 0);
+    const netRevenue = grossRevenue - totalExpenses;
+
     return {
       totalCustomers: parseInt(stats[0][0].count),
       totalServices: parseInt(stats[1][0].count),
       activeSubscriptions: parseInt(stats[2][0].count),
-      totalRevenue: parseFloat(stats[3][0].total || 0),
+      totalRevenue: netRevenue,
       recentActivity: stats[4],
       chartData: last6Months,
       totalPending: parseFloat(stats[7][0].pending || 0)
