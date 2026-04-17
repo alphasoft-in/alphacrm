@@ -567,6 +567,12 @@ export default function SubscriptionsPage() {
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Sincronizando flujo contractual...</TableCell>
                 </TableRow>
+              ) : paginatedSubs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">
+                    Sin registros en base
+                  </TableCell>
+                </TableRow>
               ) : paginatedSubs.map(sub => (
                 <TableRow key={sub.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors">
                   <TableCell className="py-4 pl-6">
