@@ -65,7 +65,7 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
                         {payload.map((p: any, i: number) => (
                           <div key={i} className="flex items-center justify-between gap-8">
                             <span className="text-[9px] font-bold uppercase text-zinc-500">{p.name}</span>
-                            <span className="text-[10px] font-black text-zinc-900">S/ {p.value.toLocaleString()}</span>
+                            <span className="text-[10px] font-black text-zinc-900">S/ {(p.value ?? 0).toLocaleString()}</span>
                           </div>
                         ))}
                       </div>
@@ -113,9 +113,9 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
                     content={({ active, payload }) => {
                        if (active && payload && payload.length) {
                           return (
-                             <div className="bg-zinc-900 p-2 px-3 rounded-lg shadow-xl">
-                                <span className="text-[9px] font-bold text-white uppercase tracking-widest">S/ {payload[0].value.toLocaleString()}</span>
-                             </div>
+                              <div className="bg-zinc-900 p-2 px-3 rounded-lg shadow-xl">
+                                 <span className="text-[9px] font-bold text-white uppercase tracking-widest">S/ {(payload[0].value ?? 0).toLocaleString()}</span>
+                              </div>
                           );
                        }
                        return null;
