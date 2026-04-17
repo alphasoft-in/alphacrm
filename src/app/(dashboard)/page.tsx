@@ -67,8 +67,8 @@ export default async function Dashboard() {
 
           <div className="grid grid-cols-2 gap-8 relative z-10 mt-6">
              <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-semibold text-zinc-900 tracking-tight uppercase leading-none">Pulso Operativo</h2>
-                <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest leading-relaxed max-w-[240px]">
+                <h2 className="text-xl font-bold text-zinc-900 tracking-tight uppercase leading-none">Pulso Operativo</h2>
+                <p className="text-[9px] text-zinc-400 font-semibold uppercase tracking-widest leading-relaxed max-w-[240px]">
                   Análisis consolidado de flujos de caja, amortizaciones y retención proyectada para el ciclo actual.
                 </p>
                 <div className="mt-4 flex items-center gap-6">
