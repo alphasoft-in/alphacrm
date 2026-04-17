@@ -13,6 +13,7 @@ import {
   Filter,
   UserCheck
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { useState, useEffect } from "react";
 import { queryDocument, saveCustomer, getCustomers, updateCustomer, deactivateCustomer } from "@/lib/actions";
 import { toast } from "sonner";
@@ -73,6 +74,9 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchCustomers();
@@ -83,6 +87,7 @@ export default function CustomersPage() {
     try {
       const data = await getCustomers();
       setDbCustomers(data || []);
+      setCurrentPage(1);
     } catch (error) {
       toast.error("Error al cargar clientes");
     } finally {
@@ -240,6 +245,19 @@ export default function CustomersPage() {
      }
   };
 
+   const filteredCustomers = dbCustomers.filter(customer => 
+     customer.name.toLowerCase().includes(search.toLowerCase()) ||
+     customer.docNumber?.toLowerCase().includes(search.toLowerCase()) ||
+     customer.email?.toLowerCase().includes(search.toLowerCase())
+   );
+
+   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+   const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+   useEffect(() => {
+     setCurrentPage(1);
+   }, [search]);
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
       <header className="flex items-center justify-between border-l-[3px] border-zinc-900 pl-4 py-0.5">
@@ -391,6 +409,8 @@ export default function CustomersPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
                 <Input 
                   placeholder="Búsqueda dinámica..." 
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
                   className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
                 />
              </div>
@@ -427,7 +447,7 @@ export default function CustomersPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                dbCustomers.map((customer) => (
+                paginatedCustomers.map((customer) => (
                   <TableRow key={customer.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors">
                     <TableCell className="py-4 pl-6">
                       <div className="flex flex-col">
@@ -488,6 +508,11 @@ export default function CustomersPage() {
               )}
             </TableBody>
           </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 

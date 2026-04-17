@@ -21,6 +21,7 @@ import {
   ArrowUpRight,
   Banknote
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -76,6 +77,8 @@ export default function PaymentsPage() {
   const [searchingCustomer, setSearchingCustomer] = useState(false);
   const [foundCustomer, setFoundCustomer] = useState<any>(null);
   const [customerEntities, setCustomerEntities] = useState<{subs: any[], deals: any[]}>({subs: [], deals: []});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [formData, setFormData] = useState({
     id: "",
@@ -99,9 +102,15 @@ export default function PaymentsPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const data = await getPayments();
-    setPayments(data);
-    setLoading(false);
+    try {
+      const data = await getPayments();
+      setPayments(data);
+      setCurrentPage(1);
+    } catch (error) {
+      toast.error("Error al cargar pagos");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenNew = () => {
@@ -245,8 +254,15 @@ export default function PaymentsPage() {
   const filteredPayments = payments.filter(p => 
     (p.customerName && p.customerName.toLowerCase().includes(search.toLowerCase())) ||
     (p.operationNumber && p.operationNumber.toLowerCase().includes(search.toLowerCase())) ||
-    p.id.toLowerCase().includes(search.toLowerCase())
+    (p.notes && p.notes.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
+  const paginatedPayments = filteredPayments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
@@ -484,9 +500,9 @@ export default function PaymentsPage() {
                 </TableRow>
               ) : filteredPayments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">Sin registros en base</TableCell>
+                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Sincronizando caja de pagos...</TableCell>
                 </TableRow>
-              ) : filteredPayments.map((payment) => (
+              ) : paginatedPayments.map((payment) => (
                 <TableRow key={payment.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors uppercase">
                   <TableCell className="py-4 pl-6">
                     <div className="flex flex-col leading-tight">
@@ -555,6 +571,11 @@ export default function PaymentsPage() {
               ))}
             </TableBody>
           </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 

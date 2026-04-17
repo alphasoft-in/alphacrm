@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Loader2
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -59,12 +60,14 @@ export default function RenewalsPage() {
   const [loading, setLoading] = useState(true);
   const [isRenewing, setIsRenewing] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchData = async () => {
-    setLoading(true);
     try {
       const data = await getUpcomingRenewals();
       setRenewals(data);
+      setCurrentPage(1);
     } catch (e) {
       toast.error("Error al cargar renovaciones.");
     } finally {
@@ -115,8 +118,15 @@ export default function RenewalsPage() {
 
   const filteredRenewals = renewals.filter(r => 
     r.customerName.toLowerCase().includes(search.toLowerCase()) ||
-    r.serviceName.toLowerCase().includes(search.toLowerCase())
+    (r.serviceName && r.serviceName.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const totalPages = Math.ceil(filteredRenewals.length / itemsPerPage);
+  const paginatedRenewals = filteredRenewals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const totalProjected = renewals.reduce((acc, r) => acc + (r.price || 0), 0);
   const expiredCount = renewals.filter(r => new Date(r.nextRenewal) < new Date()).length;
@@ -258,11 +268,9 @@ export default function RenewalsPage() {
                 </TableRow>
               ) : filteredRenewals.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center">
-                    <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">No se encontraron servicios por renovar</p>
-                  </TableCell>
+                  <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Analizando ciclos...</TableCell>
                 </TableRow>
-              ) : filteredRenewals.map((item) => {
+              ) : paginatedRenewals.map((item) => {
                 const urgency = calculateUrgency(item.nextRenewal);
                 return (
                   <TableRow key={item.id} className="border-zinc-100 transition-colors uppercase hover:bg-transparent">
@@ -327,7 +335,12 @@ export default function RenewalsPage() {
                 );
               })}
             </TableBody>
-          </ Table>
+          </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
     </div>

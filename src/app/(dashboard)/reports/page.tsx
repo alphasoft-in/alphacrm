@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,8 @@ export default function ReportsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [reportMode, setReportMode] = useState<"consolidated" | "detailed">("detailed");
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +65,7 @@ export default function ReportsPage() {
       setMovements(movData);
       setSubscriptions(subData);
       setDeals(dealData);
+      setCurrentPage(1);
       setLoading(false);
     };
     fetchData();
@@ -110,12 +114,19 @@ export default function ReportsPage() {
 
     // Filtro de búsqueda (ahora incluye customerDoc)
     const matchesSearch = 
-      act.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      act.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      act.customerDoc.toLowerCase().includes(searchTerm.toLowerCase());
+    (act.description && act.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (act.category && act.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (act.customerDoc && act.customerDoc.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return matchesPeriod && matchesSearch;
   });
+
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+  const paginatedActivities = filteredActivities.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, period]);
 
   // Cálculos para el Reporte Detallado (Estado de Cuenta por Servicio/Contrato)
   const detailedSubscriptions = subscriptions.map(sub => {
@@ -448,14 +459,14 @@ export default function ReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredActivities.length === 0 ? (
+                  {paginatedActivities.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="h-64 text-center">
                         <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Sin actividad registrada en este período</p>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredActivities.map((act, i) => (
+                    paginatedActivities.map((act, i) => (
                       <TableRow key={act.id + i} className="border-zinc-50 hover:bg-zinc-50/30 transition-colors uppercase">
                         <TableCell className="py-4 pl-7">
                           <span className="text-[9px] font-semibold text-zinc-500">{new Date(act.date).toLocaleDateString()}</span>
@@ -481,6 +492,11 @@ export default function ReportsPage() {
                   )}
                 </TableBody>
               </Table>
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
             </CardContent>
           </Card>
         </>

@@ -26,6 +26,7 @@ import {
   Filter,
   Percent
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -88,7 +89,8 @@ export default function SubscriptionsPage() {
   const [couponType, setCouponType] = useState("TRIMESTRAL");
   const [customDiscount, setCustomDiscount] = useState("10"); 
   const [generatedCode, setGeneratedCode] = useState("");
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [formData, setFormData] = useState({
     id: "",
     customerId: "",
@@ -111,6 +113,7 @@ export default function SubscriptionsPage() {
     const [subData, serData] = await Promise.all([getSubscriptions(), getServices()]);
     setSubscriptions(subData);
     setServices(serData);
+    setCurrentPage(1);
     setLoading(false);
   };
 
@@ -258,6 +261,13 @@ export default function SubscriptionsPage() {
     s.serviceName.toLowerCase().includes(search.toLowerCase()) ||
     (s.productName && s.productName.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const totalPages = Math.ceil(filteredSubs.length / itemsPerPage);
+  const paginatedSubs = filteredSubs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
@@ -557,7 +567,7 @@ export default function SubscriptionsPage() {
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Sincronizando flujo contractual...</TableCell>
                 </TableRow>
-              ) : filteredSubs.map(sub => (
+              ) : paginatedSubs.map(sub => (
                 <TableRow key={sub.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors">
                   <TableCell className="py-4 pl-6">
                     <div className="flex items-center gap-3">
@@ -618,6 +628,11 @@ export default function SubscriptionsPage() {
               ))}
             </TableBody>
           </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 

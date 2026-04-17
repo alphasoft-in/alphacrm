@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   SearchCode
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -70,6 +71,8 @@ export default function PettyCashPage() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Estados para búsqueda de cliente
   const [searchingCustomer, setSearchingCustomer] = useState(false);
@@ -102,9 +105,15 @@ export default function PettyCashPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const data = await getPettyCashMovements();
-    setMovements(data);
-    setLoading(false);
+    try {
+      const data = await getPettyCashMovements();
+      setMovements(data);
+      setCurrentPage(1);
+    } catch (e) {
+      toast.error("Error al obtener movimientos");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -246,6 +255,13 @@ export default function PettyCashPage() {
     (m.linkedCustomerName && m.linkedCustomerName.toLowerCase().includes(search.toLowerCase())) ||
     (m.customerName && m.customerName.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const totalPages = Math.ceil(filteredMovements.length / itemsPerPage);
+  const paginatedMovements = filteredMovements.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
@@ -516,7 +532,7 @@ export default function PettyCashPage() {
                           Sincronizando flujos de caja...
                        </TableCell>
                     </TableRow>
-                  ) : filteredMovements.length === 0 ? (
+                  ) : paginatedMovements.length === 0 ? (
                     <TableRow>
                        <TableCell colSpan={6} className="h-64 text-center">
                           <div className="flex flex-col items-center justify-center gap-3">
@@ -525,7 +541,7 @@ export default function PettyCashPage() {
                           </div>
                        </TableCell>
                     </TableRow>
-                  ) : filteredMovements.map(m => (
+                  ) : paginatedMovements.map(m => (
                     <TableRow key={m.id} className="border-zinc-100  uppercase">
                        <TableCell className="py-4 pl-7 text-zinc-500 whitespace-nowrap">
                           <div className="flex flex-col">
@@ -589,6 +605,13 @@ export default function PettyCashPage() {
                   ))}
                </TableBody>
             </Table>
+            <div className="p-4 border-t border-zinc-100">
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
+            </div>
          </CardContent>
       </Card>
       

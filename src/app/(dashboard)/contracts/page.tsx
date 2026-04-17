@@ -24,9 +24,9 @@ import {
   Layers,
   FileBadge,
   TrendingUp,
-  AlertTriangle,
   ArrowUpRight
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -86,6 +86,8 @@ export default function ContractsPage() {
   const [searchingCustomer, setSearchingCustomer] = useState(false);
   const [foundCustomer, setFoundCustomer] = useState<any>(null);
   const [selectedForContract, setSelectedForContract] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [formData, setFormData] = useState({
     id: "",
@@ -109,9 +111,15 @@ export default function ContractsPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const data = await getDeals();
-    setDeals(data);
-    setLoading(false);
+    try {
+      const data = await getDeals();
+      setDeals(data);
+      setCurrentPage(1);
+    } catch (error) {
+      toast.error("Error al obtener datos");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenNew = () => {
@@ -156,7 +164,7 @@ export default function ContractsPage() {
           let district = data.distrito || "";
 
           if (formData.docType === "dni") {
-             name = data.nombre_completo || data.nombreCompleto || 
+             name = data.nombre_o_razon_social || data.nombre_completo || data.nombreCompleto || 
                    (data.nombres ? `${data.nombres} ${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim() : "");
           } else {
              name = data.nombre_o_razon_social || data.razon_social || data.razonSocial || data.nombre_comercial || data.nombreComercial;
@@ -269,8 +277,15 @@ export default function ContractsPage() {
 
   const filteredDeals = deals.filter(d => 
     d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.customerName.toLowerCase().includes(search.toLowerCase())
+    (d.customerName && d.customerName.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const totalPages = Math.ceil(filteredDeals.length / itemsPerPage);
+  const paginatedDeals = filteredDeals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
@@ -573,11 +588,11 @@ export default function ContractsPage() {
                 <TableRow>
                   <TableCell colSpan={4} className="h-40 text-center text-[10px] font-semibold text-zinc-400 uppercase tracking-widest animate-pulse">Sincronizando expedientes legales...</TableCell>
                 </TableRow>
-              ) : filteredDeals.length === 0 ? (
+              ) : paginatedDeals.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center text-[10px] font-semibold text-zinc-300 uppercase tracking-widest italic">Sin registros en base</TableCell>
                 </TableRow>
-              ) : filteredDeals.map((deal) => {
+              ) : paginatedDeals.map((deal) => {
                 const paid = parseFloat(deal.paidAmount || 0);
                 const progress = (paid / deal.totalAmount) * 100;
                 return (
@@ -658,6 +673,11 @@ export default function ContractsPage() {
               })}
             </TableBody>
           </Table>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 
