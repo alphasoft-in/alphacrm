@@ -369,16 +369,30 @@ export async function getDashboardStats() {
       sql`SELECT (SELECT COUNT(*) FROM "Subscription" WHERE status = 'ACTIVE') + (SELECT COUNT(*) FROM "Deal" WHERE status != 'CANCELLED') as count`,
       sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED'`,
       sql`
-        SELECT p.id, c.name as "customerName", 
-        COALESCE(ser.name, d.name) as "serviceName", 
-        p."paymentDate" as "date"
-        FROM "Payment" p
-        JOIN "Customer" c ON p."customerId" = c.id
-        LEFT JOIN "Subscription" s ON p."subscriptionId" = s.id
-        LEFT JOIN "Service" ser ON s."serviceId" = ser.id
-        LEFT JOIN "Deal" d ON p."dealId" = d.id
-        WHERE p.status = 'COMPLETED'
-        ORDER BY p."createdAt" DESC
+        SELECT * FROM (
+          SELECT p.id, c.name as "customerName", 
+            COALESCE(ser.name, d.name) as "serviceName", 
+            p."paymentDate" as "date",
+            'PAYMENT' as "type",
+            p."createdAt" as "timestamp"
+          FROM "Payment" p
+          JOIN "Customer" c ON p."customerId" = c.id
+          LEFT JOIN "Subscription" s ON p."subscriptionId" = s.id
+          LEFT JOIN "Service" ser ON s."serviceId" = ser.id
+          LEFT JOIN "Deal" d ON p."dealId" = d.id
+          WHERE p.status = 'COMPLETED'
+          
+          UNION ALL
+          
+          SELECT id, 
+            COALESCE("customerName", 'CAJA CHICA') as "customerName",
+            description as "serviceName",
+            date,
+            type as "type",
+            "createdAt" as "timestamp"
+          FROM "PettyCash"
+        ) AS combined
+        ORDER BY "timestamp" DESC
         LIMIT 10
       `,
       // Nueva consulta para datos de gráficos (últimos 6 meses)
@@ -442,6 +456,44 @@ export async function getDashboardStats() {
       totalPending: parseFloat(stats[7][0].pending || 0)
     };
   } catch (e) { return null; }
+}
+
+export async function getGlobalActivity() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return [];
+  const sql = neon(dbUrl);
+  try {
+    const activity = await sql`
+      SELECT * FROM (
+        SELECT p.id, c.name as "customerName", 
+          COALESCE(ser.name, d.name) as "serviceName", 
+          p."paymentDate" as "date",
+          'PAYMENT' as "type",
+          p."createdAt" as "timestamp",
+          p.amount
+        FROM "Payment" p
+        JOIN "Customer" c ON p."customerId" = c.id
+        LEFT JOIN "Subscription" s ON p."subscriptionId" = s.id
+        LEFT JOIN "Service" ser ON s."serviceId" = ser.id
+        LEFT JOIN "Deal" d ON p."dealId" = d.id
+        WHERE p.status = 'COMPLETED'
+        
+        UNION ALL
+        
+        SELECT id, 
+          COALESCE("customerName", 'CAJA CHICA') as "customerName",
+          description as "serviceName",
+          date,
+          type as "type",
+          "createdAt" as "timestamp",
+          amount
+        FROM "PettyCash"
+      ) AS combined
+      ORDER BY "timestamp" DESC
+      LIMIT 15
+    `;
+    return activity;
+  } catch (e) { return []; }
 }
 
 // --- CAJA CHICA ---

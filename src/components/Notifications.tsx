@@ -8,7 +8,10 @@ import {
   ChevronRight, 
   AlertTriangle,
   CheckCircle2,
-  MoreVertical
+  MoreVertical,
+  DollarSign,
+  ArrowDownCircle,
+  ArrowUpCircle
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -19,22 +22,27 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { getUpcomingRenewals } from "@/lib/actions";
+import { getUpcomingRenewals, getGlobalActivity } from "@/lib/actions";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function Notifications() {
-  const [renewals, setRenewals] = useState<any[]>([]);
+  const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
 
   useEffect(() => {
-    const fetchRenewals = async () => {
-      const data = await getUpcomingRenewals();
-      setRenewals(data);
+    const fetchData = async () => {
+      setLoading(true);
+      const [renewalsData, activityData] = await Promise.all([
+        getUpcomingRenewals(),
+        getGlobalActivity()
+      ]);
+      setRenewals(renewalsData);
+      setActivity(activityData);
       setLoading(false);
     };
-    fetchRenewals();
+    fetchData();
   }, [pathname]);
 
   const getDaysRemaining = (date: string) => {
@@ -50,11 +58,11 @@ export function Notifications() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-zinc-900 transition-colors">
           <Bell size={20} />
-          {renewals.length > 0 && (
+          {(renewals.length + activity.length) > 0 && (
             <span className="absolute top-2 right-2 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-900 opacity-20"></span>
               <span className="relative inline-flex rounded-full h-4 w-4 bg-zinc-900 text-[9px] text-white font-bold items-center justify-center border border-white">
-                {renewals.length}
+                {renewals.length + activity.length}
               </span>
             </span>
           )}
@@ -63,8 +71,8 @@ export function Notifications() {
       
       <DropdownMenuContent align="end" className="w-[300px] p-0 border-zinc-200 bg-white shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <DropdownMenuLabel className="px-5 py-4 bg-zinc-50 border-b border-zinc-100 flex flex-col gap-1">
-           <span className="text-[8px] font-semibold text-zinc-400 uppercase tracking-[0.2em] leading-none">Notificaciones Continentales</span>
-           <span className="text-[10px] font-bold text-zinc-900 uppercase tracking-tight">Alertas de Renovación</span>
+           <span className="text-[8px] font-semibold text-zinc-400 uppercase tracking-[0.2em] leading-none">Monitoreo Continental</span>
+           <span className="text-[10px] font-bold text-zinc-900 uppercase tracking-tight">Actividad y Alertas</span>
         </DropdownMenuLabel>
         
         <div className="max-h-[350px] overflow-y-auto">
@@ -81,43 +89,72 @@ export function Notifications() {
              </div>
           ) : (
             <div className="py-1">
-              {renewals.map((renewal) => {
-                const daysLeft = renewal.nextRenewal ? getDaysRemaining(renewal.nextRenewal) : -1;
-                const isOverdue = daysLeft <= 0;
-                const isUndefined = !renewal.nextRenewal;
-                
-                return (
-                  <Link href="/renewals" key={renewal.id}>
-                    <DropdownMenuItem className="px-5 py-3.5 cursor-pointer hover:bg-zinc-50 border-none transition-colors group">
-                      <div className="flex gap-4 items-start w-full">
-                        <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${isUndefined ? 'bg-orange-500 animate-pulse' : isOverdue ? 'bg-zinc-900 shadow-[0_0_8px_rgba(0,0,0,0.3)]' : daysLeft <= 7 ? 'bg-zinc-600' : 'bg-zinc-200'}`} />
-                        <div className="flex flex-col flex-1 gap-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
-                              {renewal.customerName}
-                            </span>
-                            <span className={`text-[8px] font-bold uppercase tracking-widest ${isUndefined ? 'text-orange-600' : isOverdue ? 'text-zinc-950 underline decoration-zinc-300' : 'text-zinc-400'}`}>
-                              {isUndefined ? 'PENDIENTE' : isOverdue ? 'Vencido' : `${daysLeft}d`}
-                            </span>
-                          </div>
-                          <span className="text-[8px] text-zinc-500 font-semibold uppercase tracking-tight leading-none">
-                            {renewal.serviceName}
-                          </span>
-                          <div className="flex items-center gap-1 mt-1">
-                             <Calendar size={10} className="text-zinc-300" />
-                             <span className="text-[8px] font-bold text-zinc-400">
-                               {renewal.nextRenewal 
-                                 ? new Date(renewal.nextRenewal).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: '2-digit' }) 
-                                 : 'FECHA NO DEFINIDA'}
+              {/* TRANSACCIONES RECIENTES */}
+              {activity.length > 0 && (
+                <>
+                  <div className="px-5 py-2 bg-zinc-50/50 text-[8px] font-bold text-zinc-400 uppercase tracking-widest border-y border-zinc-100">
+                    Transacciones Recientes
+                  </div>
+                  {activity.map((act) => (
+                    <DropdownMenuItem key={act.id} className="px-5 py-3 cursor-pointer hover:bg-zinc-50 transition-colors border-none group">
+                       <div className="flex gap-4 items-start w-full">
+                          <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${act.type === 'INCOME' || act.type === 'PAYMENT' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                          <div className="flex flex-col flex-1 gap-1">
+                             <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
+                                   {act.customerName}
+                                </span>
+                                <span className="text-[9px] font-bold text-zinc-900 tracking-tighter">
+                                   {act.type === 'EXPENSE' ? '-' : '+'} S/ {parseFloat(act.amount).toFixed(2)}
+                                </span>
+                             </div>
+                             <span className="text-[8px] text-zinc-400 font-semibold uppercase tracking-tight leading-none truncate max-w-[180px]">
+                                {act.serviceName}
                              </span>
                           </div>
-                        </div>
-                        <ChevronRight size={12} className="text-zinc-200 mt-2 group-hover:text-zinc-900 transition-colors" />
-                      </div>
+                       </div>
                     </DropdownMenuItem>
-                  </Link>
-                );
-              })}
+                  ))}
+                </>
+              )}
+
+              {/* RENOVACIONES */}
+              {renewals.length > 0 && (
+                <>
+                  <div className="px-5 py-2 bg-zinc-50/50 text-[8px] font-bold text-zinc-400 uppercase tracking-widest border-y border-zinc-100">
+                    Alertas de Renovación
+                  </div>
+                  {renewals.map((renewal) => {
+                    const daysLeft = renewal.nextRenewal ? getDaysRemaining(renewal.nextRenewal) : -1;
+                    const isOverdue = daysLeft <= 0;
+                    const isUndefined = !renewal.nextRenewal;
+                    
+                    return (
+                      <Link href="/renewals" key={renewal.id}>
+                        <DropdownMenuItem className="px-5 py-3.5 cursor-pointer hover:bg-zinc-50 border-none transition-colors group">
+                          <div className="flex gap-4 items-start w-full">
+                            <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${isUndefined ? 'bg-orange-500 animate-pulse' : isOverdue ? 'bg-zinc-900 shadow-[0_0_8px_rgba(0,0,0,0.3)]' : daysLeft <= 7 ? 'bg-zinc-600' : 'bg-zinc-200'}`} />
+                            <div className="flex flex-col flex-1 gap-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
+                                  {renewal.customerName}
+                                </span>
+                                <span className={`text-[8px] font-bold uppercase tracking-widest ${isUndefined ? 'text-orange-600' : isOverdue ? 'text-zinc-950 underline decoration-zinc-300' : 'text-zinc-400'}`}>
+                                  {isUndefined ? 'PENDIENTE' : isOverdue ? 'Vencido' : `${daysLeft}d`}
+                                </span>
+                              </div>
+                              <span className="text-[8px] text-zinc-500 font-semibold uppercase tracking-tight leading-none">
+                                {renewal.serviceName}
+                              </span>
+                            </div>
+                            <ChevronRight size={12} className="text-zinc-200 mt-2 group-hover:text-zinc-900 transition-colors" />
+                          </div>
+                        </DropdownMenuItem>
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
             </div>
           )}
         </div>
