@@ -96,9 +96,8 @@ export default async function Dashboard() {
                       <span className="text-[10px] font-semibold text-zinc-900 truncate uppercase tracking-tight">{act.customerName}</span>
                       <span className="text-[8px] font-medium text-zinc-400 truncate uppercase tracking-widest">{act.serviceName}</span>
                    </div>
-                   <div className="flex flex-col items-end gap-0.5">
+                   <div className="flex flex-col items-end">
                       <span className="text-[8px] font-bold text-zinc-500 uppercase">{new Date(act.date).toLocaleDateString()}</span>
-                      <div className="h-1.5 w-1.5 rounded-full bg-zinc-100 group-hover:bg-zinc-900 transition-colors" />
                    </div>
                 </div>
              ))}
