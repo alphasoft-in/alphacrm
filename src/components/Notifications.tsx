@@ -24,13 +24,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { getUpcomingRenewals, getGlobalActivity } from "@/lib/actions";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Notifications() {
   const [renewals, setRenewals] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastRead, setLastRead] = useState<number>(0);
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lastReadNotifications');
+    if (saved) setLastRead(parseInt(saved));
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,24 +53,31 @@ export function Notifications() {
     fetchData();
   }, [pathname]);
 
-  const getDaysRemaining = (date: string) => {
-    const today = new Date();
-    const expiry = new Date(date);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const markAllAsRead = () => {
+    const now = Date.now();
+    localStorage.setItem('lastReadNotifications', now.toString());
+    setLastRead(now);
   };
+
+  const handleNotificationClick = (target: string) => {
+    markAllAsRead();
+    router.push(target);
+  };
+
+  const unreadCount = 
+    renewals.filter(r => !lastRead || new Date(r.timestamp || r.nextRenewal || 0).getTime() > lastRead).length + 
+    activity.filter(a => !lastRead || new Date(a.timestamp || a.date).getTime() > lastRead).length;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-zinc-900 transition-colors">
           <Bell size={20} />
-          {(renewals.length + activity.length) > 0 && (
+          {unreadCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-900 opacity-20"></span>
               <span className="relative inline-flex rounded-full h-4 w-4 bg-zinc-900 text-[8px] text-white font-bold items-center justify-center border-2 border-white">
-                {renewals.length + activity.length}
+                {unreadCount}
               </span>
             </span>
           )}
@@ -125,32 +139,34 @@ export function Notifications() {
                     Alertas de Renovación
                   </div>
                   {renewals.map((renewal) => {
-                    const daysLeft = renewal.nextRenewal ? getDaysRemaining(renewal.nextRenewal) : -1;
+                    const daysLeft = renewal.nextRenewal ? (Math.ceil((new Date(renewal.nextRenewal).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : -1;
                     const isOverdue = daysLeft <= 0;
                     const isUndefined = !renewal.nextRenewal;
                     
                     return (
-                      <Link href="/renewals" key={renewal.id}>
-                        <DropdownMenuItem className="px-5 py-3.5 cursor-pointer hover:bg-zinc-50 border-none transition-colors group">
-                          <div className="flex gap-4 items-start w-full">
-                            <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${isUndefined ? 'bg-orange-500 animate-pulse' : isOverdue ? 'bg-zinc-900 shadow-[0_0_8px_rgba(0,0,0,0.3)]' : daysLeft <= 7 ? 'bg-zinc-600' : 'bg-zinc-200'}`} />
-                            <div className="flex flex-col flex-1 gap-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
-                                  {renewal.customerName}
-                                </span>
-                                <span className={`text-[8px] font-bold uppercase tracking-widest ${isUndefined ? 'text-orange-600' : isOverdue ? 'text-zinc-950 underline decoration-zinc-300' : 'text-zinc-400'}`}>
-                                  {isUndefined ? 'PENDIENTE' : isOverdue ? 'Vencido' : `${daysLeft}d`}
-                                </span>
-                              </div>
-                              <span className="text-[8px] text-zinc-500 font-semibold uppercase tracking-tight leading-none">
-                                {renewal.serviceName}
+                      <DropdownMenuItem 
+                        key={renewal.id} 
+                        className="px-5 py-3.5 cursor-pointer hover:bg-zinc-50 border-none transition-colors group"
+                        onClick={() => handleNotificationClick('/renewals')}
+                      >
+                        <div className="flex gap-4 items-start w-full">
+                          <div className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${isUndefined ? 'bg-orange-500 animate-pulse' : isOverdue ? 'bg-zinc-900 shadow-[0_0_8px_rgba(0,0,0,0.3)]' : daysLeft <= 7 ? 'bg-zinc-600' : 'bg-zinc-200'}`} />
+                          <div className="flex flex-col flex-1 gap-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-bold text-zinc-900 uppercase leading-none truncate max-w-[140px] tracking-tight">
+                                {renewal.customerName}
+                              </span>
+                              <span className={`text-[8px] font-bold uppercase tracking-widest ${isUndefined ? 'text-orange-600' : isOverdue ? 'text-zinc-950 underline decoration-zinc-300' : 'text-zinc-400'}`}>
+                                {isUndefined ? 'PENDIENTE' : isOverdue ? 'Vencido' : `${daysLeft}d`}
                               </span>
                             </div>
-                            <ChevronRight size={12} className="text-zinc-200 mt-2 group-hover:text-zinc-900 transition-colors" />
+                            <span className="text-[8px] text-zinc-500 font-semibold uppercase tracking-tight leading-none">
+                              {renewal.serviceName}
+                            </span>
                           </div>
-                        </DropdownMenuItem>
-                      </Link>
+                          <ChevronRight size={12} className="text-zinc-200 mt-2 group-hover:text-zinc-900 transition-colors" />
+                        </div>
+                      </DropdownMenuItem>
                     );
                   })}
                 </>
@@ -161,12 +177,15 @@ export function Notifications() {
         
         <DropdownMenuSeparator className="bg-zinc-50" />
         <DropdownMenuItem asChild>
-            <Link href="/reports" className="w-full px-5 py-3 hover:bg-zinc-50 transition-colors flex items-center justify-center outline-none cursor-pointer">
+            <button 
+              onClick={() => handleNotificationClick('/reports')}
+              className="w-full px-5 py-3 hover:bg-zinc-50 transition-colors flex items-center justify-center outline-none cursor-pointer border-none bg-transparent"
+            >
               <span className="text-[8px] font-bold text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-2">
                  Ver todas las actividades
                  <ArrowUpRight size={10} />
               </span>
-            </Link>
+            </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
