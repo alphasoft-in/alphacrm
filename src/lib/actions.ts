@@ -731,39 +731,58 @@ export async function getAccountsReceivable() {
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
   try {
-    // Consulta separada para depuración y mayor fiabilidad
-    const deals = await sql`
-      SELECT d.id, c.name as "customerName", d.name as "description", 
-        (COALESCE(d."totalAmount", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
-        d."dealDate" as "date",
-        'DEAL' as source
-      FROM "Deal" d
-      JOIN "Customer" c ON d."customerId" = c.id
-      WHERE LOWER(d.status) != 'cancelled'
-    `;
+    // 1. Obtener todos los datos base por separado para evitar errores de JOIN o Tipos en SQL
+    const [deals, customers, payments, subs, services] = await Promise.all([
+      sql`SELECT id, name, "totalAmount", "customerId", status, "dealDate" FROM "Deal"`,
+      sql`SELECT id, name FROM "Customer"`,
+      sql`SELECT "dealId", amount FROM "Payment" WHERE status = 'COMPLETED' AND "dealId" IS NOT NULL`,
+      sql`SELECT id, "customerId", "serviceId", price, status, "nextRenewal" FROM "Subscription"`,
+      sql`SELECT id, name FROM "Service"`
+    ]);
 
-    const subscriptions = await sql`
-      SELECT s.id, c.name as "customerName", ser.name as "description",
-        COALESCE(s.price, 0) as balance,
-        s."nextRenewal" as "date",
-        'SUBSCRIPTION' as source
-      FROM "Subscription" s
-      JOIN "Customer" c ON s."customerId" = c.id
-      JOIN "Service" ser ON s."serviceId" = ser.id
-      WHERE LOWER(s.status) = 'active'
-    `;
+    // 2. Procesar Contratos (Deals)
+    const dealReceivables = deals.map(d => {
+      const customer = customers.find(c => c.id === d.customerId);
+      const paidForThisDeal = payments
+        .filter(p => p.dealId === d.id)
+        .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+      
+      const balance = parseFloat(d.totalAmount || 0) - paidForThisDeal;
 
-    const combined = [...deals, ...subscriptions]
-      .map(item => ({
-        ...item,
-        balance: parseFloat(item.balance.toString())
-      }))
-      .filter(item => item.balance > 0.01)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return {
+        id: d.id,
+        customerName: customer?.name || "CLIENTE NO ENCONTRADO",
+        description: d.name || "CONTRATO SIN NOMBRE",
+        balance: balance,
+        date: d.dealDate || new Date(),
+        source: 'DEAL',
+        status: d.status
+      };
+    }).filter(d => d.balance > 1 && d.status !== 'CANCELLED');
 
-    return combined;
-  } catch (e) { 
-    console.error("RECEIVABLES_ERROR:", e);
-    return []; 
+    // 3. Procesar Suscripciones
+    const subReceivables = subs.map(s => {
+      const customer = customers.find(c => c.id === s.customerId);
+      const service = services.find(ser => ser.id === s.serviceId);
+      
+      return {
+        id: s.id,
+        customerName: customer?.name || "CLIENTE NO ENCONTRADO",
+        description: service?.name || "SUSCRIPCIÓN",
+        balance: parseFloat(s.price || 0),
+        date: s.nextRenewal || new Date(),
+        source: 'SUBSCRIPTION',
+        status: s.status
+      };
+    }).filter(s => (s.status === 'ACTIVE' || s.status === 'active') && s.balance > 0);
+
+    // 4. Combinar y Ordenar
+    return [...dealReceivables, ...subReceivables].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+  } catch (e) {
+    console.error("DEBUG_RECEIVABLES_FAIL:", e);
+    return [];
   }
 }
