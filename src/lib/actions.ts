@@ -217,10 +217,29 @@ export async function saveDeal(data: any) {
   if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
+    // Asegurar que las columnas existen
+    try {
+      await sql`ALTER TABLE "Deal" ADD COLUMN IF NOT EXISTS "startDate" DATE`;
+      await sql`ALTER TABLE "Deal" ADD COLUMN IF NOT EXISTS "endDate" DATE`;
+    } catch (e) { /* Ya existen */ }
+
     if (data.id) {
-       await sql`UPDATE "Deal" SET name = ${data.name}, description = ${data.description || null}, "totalAmount" = ${data.totalAmount}, "downPayment" = ${parseFloat(data.downPayment || 0)}, status = ${data.status || 'OPEN'}, "contactMethod" = ${data.contactMethod || null}, "paymentTerms" = ${data.paymentTerms || "50-50"}, installments = ${parseInt(data.installments || 1)}, "dealDate" = ${parseDate(data.dealDate)}, "updatedAt" = NOW() WHERE id = ${data.id}`;
+       await sql`UPDATE "Deal" SET 
+         name = ${data.name}, 
+         description = ${data.description || null}, 
+         "totalAmount" = ${data.totalAmount}, 
+         "downPayment" = ${parseFloat(data.downPayment || 0)}, 
+         status = ${data.status || 'OPEN'}, 
+         "contactMethod" = ${data.contactMethod || null}, 
+         "paymentTerms" = ${data.paymentTerms || "50-50"}, 
+         installments = ${parseInt(data.installments || 1)}, 
+         "dealDate" = ${parseDate(data.dealDate)}, 
+         "startDate" = ${parseDate(data.startDate)},
+         "endDate" = ${parseDate(data.endDate)},
+         "updatedAt" = NOW() 
+       WHERE id = ${data.id}`;
     } else {
-       await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${parseDate(data.dealDate)}, NOW())`;
+       await sql`INSERT INTO "Deal" (id, "customerId", name, description, "totalAmount", "downPayment", status, "contactMethod", "paymentTerms", installments, "dealDate", "startDate", "endDate", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.name}, ${data.description || null}, ${data.totalAmount}, ${parseFloat(data.downPayment || 0)}, ${data.status || 'OPEN'}, ${data.contactMethod || null}, ${data.paymentTerms || "50-50"}, ${parseInt(data.installments || 1)}, ${parseDate(data.dealDate)}, ${parseDate(data.startDate)}, ${parseDate(data.endDate)}, NOW())`;
     }
     revalidatePath("/contracts");
     return { success: true };

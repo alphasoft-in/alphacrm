@@ -137,7 +137,9 @@ export default function ContractsPage() {
       contactMethod: "WHATSAPP",
       paymentTerms: "50-50",
       installments: "1",
-      dealDate: new Date().toISOString().split('T')[0]
+      dealDate: new Date().toISOString().split('T')[0],
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: ""
     });
     setFoundCustomer(null);
     setOpen(true);
@@ -431,6 +433,17 @@ export default function ContractsPage() {
                      </div>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                        <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Inicio Contrato</Label>
+                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
+                     </div>
+                    <div className="space-y-1.5">
+                        <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Fin Contrato</Label>
+                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
+                     </div>
+                  </div>
+
                   {/* Financial Section */}
                   <div className="grid grid-cols-4 gap-4 bg-zinc-50 border border-zinc-100 p-5 rounded-2xl items-end mt-2 transition-all hover:border-zinc-200">
                      <div className="space-y-1.5">
@@ -654,7 +667,9 @@ export default function ContractsPage() {
                                  contactMethod: deal.contactMethod,
                                  paymentTerms: deal.paymentTerms || "50-50",
                                  installments: (deal.installments || 1).toString(),
-                                 dealDate: deal.dealDate ? new Date(deal.dealDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+                                 dealDate: deal.dealDate ? new Date(deal.dealDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                                 startDate: deal.startDate ? new Date(deal.startDate).toISOString().split('T')[0] : "",
+                                 endDate: deal.endDate ? new Date(deal.endDate).toISOString().split('T')[0] : ""
                                });
                                setFoundCustomer({id: deal.customerId, name: deal.customerName, address: deal.address, docNumber: deal.docNumber, docType: deal.docType});
                                setOpen(true);
