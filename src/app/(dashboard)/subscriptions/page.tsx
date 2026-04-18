@@ -310,7 +310,7 @@ export default function SubscriptionsPage() {
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Identificar Cliente</Label>
                 <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-12 bg-white focus-within:border-zinc-400 transition-all shadow-sm focus-within:shadow-md">
                   <Select value={formData.docType} onValueChange={v => setFormData({...formData, docType: v})}>
-                    <SelectTrigger className="w-[110px] border-none rounded-none font-semibold text-xs focus:ring-0 uppercase h-full bg-zinc-50/50 border-r border-zinc-100 px-4">
+                    <SelectTrigger className="w-[110px] border-none rounded-none font-semibold text-xs focus:ring-0 uppercase h-full bg-zinc-50/50 border-r border-zinc-100 px-4 shadow-none">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -328,7 +328,7 @@ export default function SubscriptionsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full text-sm font-medium tracking-tight focus-visible:ring-0 flex-1 px-5"
+                    className="border-none bg-transparent h-full text-sm font-medium tracking-tight focus-visible:ring-0 flex-1 px-5 shadow-none"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
@@ -365,7 +365,7 @@ export default function SubscriptionsPage() {
                   const s = services.find(ser => ser.id === v);
                   setFormData({...formData, serviceId: v, price: s ? s.basePrice.toString() : formData.price});
                 }}>
-                  <SelectTrigger className="border-zinc-200 h-10 text-xs font-semibold bg-zinc-50/30 rounded-xl">
+                  <SelectTrigger className="border-zinc-200 h-10 text-xs font-semibold bg-zinc-50/30 rounded-xl shadow-none">
                     <SelectValue placeholder="---" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-zinc-100 bg-white">
@@ -384,7 +384,7 @@ export default function SubscriptionsPage() {
                   <Input 
                     value={formData.productName}
                     onChange={e => setFormData({...formData, productName: e.target.value})}
-                    className="border-zinc-100 h-10 text-sm font-semibold bg-zinc-50/30" 
+                    className="border-zinc-100 h-10 text-sm font-semibold bg-zinc-50/30 shadow-none" 
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -393,7 +393,7 @@ export default function SubscriptionsPage() {
                      type="date"
                      value={formData.startDate}
                      onChange={e => setFormData({...formData, startDate: e.target.value})}
-                     className="border-zinc-100 h-10 text-xs font-semibold bg-zinc-50/30" 
+                     className="border-zinc-100 h-10 text-xs font-semibold bg-zinc-50/30 shadow-none" 
                    />
                 </div>
               </div>
@@ -402,7 +402,7 @@ export default function SubscriptionsPage() {
                 <div className="space-y-1.5">
                    <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Meses Contratados</Label>
                    <Select value={formData.months} onValueChange={v => setFormData({...formData, months: v})}>
-                      <SelectTrigger className="border-zinc-200 h-10 text-[11px] font-semibold bg-zinc-50/30 rounded-xl px-4">
+                      <SelectTrigger className="border-zinc-200 h-10 text-[11px] font-semibold bg-zinc-50/30 rounded-xl px-4 shadow-none">
                          <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-zinc-100 bg-white">
@@ -421,7 +421,7 @@ export default function SubscriptionsPage() {
                       value={formData.price}
                       onChange={e => setFormData({...formData, price: e.target.value})}
                       onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                      className="pl-8 border-zinc-200 h-10 text-xs font-bold bg-zinc-50/30 rounded-xl" 
+                      className="pl-8 border-zinc-200 h-10 text-xs font-bold bg-zinc-50/30 rounded-xl shadow-none" 
                     />
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                   </div>
@@ -434,7 +434,7 @@ export default function SubscriptionsPage() {
                   placeholder="PROMOCIÓN O REFERENCIA DE DESCUENTO..."
                   value={formData.discountCode}
                   onChange={e => setFormData({...formData, discountCode: e.target.value})}
-                  className="border-zinc-200 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase rounded-xl px-4" 
+                  className="border-zinc-200 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase rounded-xl px-4 shadow-none" 
                 />
               </div>
 
