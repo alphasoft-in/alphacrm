@@ -396,7 +396,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-9 text-sm font-medium shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 text-xs font-medium shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
