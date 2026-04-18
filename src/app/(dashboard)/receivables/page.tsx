@@ -156,8 +156,8 @@ export default function ReceivablesPage() {
                   <TableRow key={r.id} className="border-zinc-100 hover:bg-zinc-50/50 transition-colors group">
                     <TableCell className="py-5 pl-8">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-[11px] font-bold text-zinc-900 uppercase tracking-tight">{r.customerName}</span>
-                        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                        <span className="text-[11px] font-medium text-zinc-900 uppercase tracking-tight">{r.customerName}</span>
+                        <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest flex items-center gap-1">
                           <FileText size={10} /> {r.description}
                         </span>
                       </div>
@@ -169,14 +169,14 @@ export default function ReceivablesPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className={`text-[10px] font-bold ${isOverdue ? 'text-rose-600' : 'text-zinc-500'}`}>{new Date(r.date).toLocaleDateString()}</span>
+                        <span className={`text-[10px] font-medium ${isOverdue ? 'text-rose-600' : 'text-zinc-500'}`}>{new Date(r.date).toLocaleDateString()}</span>
                         {isOverdue && <span className="text-[7px] font-black bg-rose-600 text-white px-1.5 rounded-full uppercase tracking-tighter">MORA</span>}
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-8">
                       <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold text-zinc-950 tracking-tighter">S/ {parseFloat(r.balance).toFixed(2)}</span>
-                        <span className="text-[7px] font-bold text-zinc-400 uppercase tracking-widest">Saldo de Cobro</span>
+                        <span className="text-sm font-medium text-zinc-950 tracking-tighter">S/ {parseFloat(r.balance).toFixed(2)}</span>
+                        <span className="text-[7px] font-medium text-zinc-400 uppercase tracking-widest">Saldo de Cobro</span>
                       </div>
                     </TableCell>
                   </TableRow>
