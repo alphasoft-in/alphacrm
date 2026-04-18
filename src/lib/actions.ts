@@ -288,28 +288,47 @@ export async function saveSubscription(data: any) {
   if (!dbUrl) return { success: false, error: "Conexión no configurada" };
   const sql = neon(dbUrl);
   try {
+    // Add columns if missing
+    try {
+      await sql`ALTER TABLE "Subscription" ADD COLUMN IF NOT EXISTS "discountCode" TEXT`;
+      await sql`ALTER TABLE "Subscription" ADD COLUMN IF NOT EXISTS "months" INTEGER DEFAULT 1`;
+    } catch (e) {}
+
     const serviceRes = await sql`SELECT "billingCycle", "basePrice" FROM "Service" WHERE id = ${data.serviceId}`;
     if (serviceRes.length === 0) return { success: false, error: "Servicio no encontrado" };
     const service = serviceRes[0];
+    
     const startDate = new Date(data.startDate);
     const nextRenewal = new Date(startDate);
+    const monthsPaid = parseInt(data.months || 1);
     
-    // Logic for next renewal calculation
-    if (service.billingCycle === 'MONTHLY') nextRenewal.setDate(nextRenewal.getDate() + 30);
-    else if (service.billingCycle === 'QUARTERLY') nextRenewal.setDate(nextRenewal.getDate() + 90);
-    else if (service.billingCycle === 'SEMI_ANNUAL') nextRenewal.setDate(nextRenewal.getDate() + 180);
-    else if (service.billingCycle === 'ANNUAL') nextRenewal.setDate(nextRenewal.getDate() + 365);
-    else nextRenewal.setDate(nextRenewal.getDate() + 30); // Default
+    // Calcular próxima renovación basada en meses pagados
+    nextRenewal.setMonth(nextRenewal.getMonth() + monthsPaid);
 
     const price = data.price ?? parseFloat(service.basePrice);
+    
     if (data.id) {
-       await sql`UPDATE "Subscription" SET "serviceId" = ${data.serviceId}, "productName" = ${data.productName || null}, "startDate" = ${parseDate(data.startDate)}, "nextRenewal" = ${nextRenewal}, "status" = ${data.status || 'ACTIVE'}, "price" = ${price}, "updatedAt" = NOW() WHERE id = ${data.id}`;
+       await sql`UPDATE "Subscription" SET 
+         "serviceId" = ${data.serviceId}, 
+         "productName" = ${data.productName || null}, 
+         "startDate" = ${parseDate(data.startDate)}, 
+         "nextRenewal" = ${nextRenewal}, 
+         "status" = ${data.status || 'ACTIVE'}, 
+         "price" = ${price}, 
+         "discountCode" = ${data.discountCode || null},
+         "months" = ${monthsPaid},
+         "updatedAt" = NOW() 
+       WHERE id = ${data.id}`;
     } else {
-       await sql`INSERT INTO "Subscription" (id, "customerId", "serviceId", "productName", "startDate", "nextRenewal", "status", "price", "createdAt", "updatedAt") VALUES (${crypto.randomUUID()}, ${data.customerId}, ${data.serviceId}, ${data.productName || null}, ${parseDate(data.startDate)}, ${nextRenewal}, ${data.status || 'ACTIVE'}, ${price}, NOW(), NOW())`;
+       await sql`INSERT INTO "Subscription" (
+         id, "customerId", "serviceId", "productName", "startDate", "nextRenewal", "status", "price", "discountCode", "months", "createdAt", "updatedAt"
+       ) VALUES (
+         ${crypto.randomUUID()}, ${data.customerId}, ${data.serviceId}, ${data.productName || null}, ${parseDate(data.startDate)}, ${nextRenewal}, ${data.status || 'ACTIVE'}, ${price}, ${data.discountCode || null}, ${monthsPaid}, NOW(), NOW()
+       )`;
     }
     revalidatePath("/subscriptions");
     revalidatePath("/renewals");
-    revalidatePath("/"); // Update global navbar notifications
+    revalidatePath("/");
     return { success: true };
   } catch (e: any) { return { success: false, error: e.message }; }
 }

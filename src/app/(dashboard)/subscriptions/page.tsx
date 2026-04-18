@@ -101,7 +101,8 @@ export default function SubscriptionsPage() {
     price: "",
     productName: "",
     status: "ACTIVE",
-    discountCode: ""
+    discountCode: "",
+    months: "1"
   });
 
   useEffect(() => {
@@ -146,7 +147,8 @@ export default function SubscriptionsPage() {
       price: "",
       productName: "",
       status: "ACTIVE",
-      discountCode: ""
+      discountCode: "",
+      months: "1"
     });
     setFoundCustomer(null);
     setOpen(true);
@@ -164,7 +166,8 @@ export default function SubscriptionsPage() {
       price: sub.price ? sub.price.toString() : "",
       productName: sub.productName || "",
       status: sub.status,
-      discountCode: ""
+      discountCode: sub.discountCode || "",
+      months: (sub.months || 1).toString()
     });
     setFoundCustomer({ 
       id: sub.customerId, 
@@ -216,7 +219,9 @@ export default function SubscriptionsPage() {
         startDate: formData.startDate,
         status: formData.status,
         productName: formData.productName,
-        price: formData.price ? parseFloat(formData.price) : undefined
+        price: formData.price ? parseFloat(formData.price) : undefined,
+        discountCode: formData.discountCode,
+        months: formData.months
       });
 
       if (result.success) {
@@ -390,10 +395,37 @@ export default function SubscriptionsPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                   <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Meses Contratados</Label>
+                   <Select value={formData.months} onValueChange={v => setFormData({...formData, months: v})}>
+                      <SelectTrigger className="border-zinc-100 h-10 text-xs font-semibold bg-zinc-50/30">
+                         <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                         {[1,2,3,4,5,6,12,24].map(m => (
+                           <SelectItem key={m} value={m.toString()} className="text-xs font-semibold">{m} {m === 1 ? 'Mes' : 'Meses'}</SelectItem>
+                         ))}
+                      </SelectContent>
+                   </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Código de Oferta</Label>
+                  <Input 
+                    placeholder="PROMOCIÓN / CUPÓN"
+                    value={formData.discountCode}
+                    onChange={e => setFormData({...formData, discountCode: e.target.value})}
+                    className="border-zinc-100 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase" 
+                  />
+                </div>
+              </div>
+
               {/* Cálculo Rápido de Costo */}
               {formData.serviceId && (() => {
                 const service = services.find(s => s.id === formData.serviceId);
-                const basePrice = service?.basePrice || 0;
+                const months = parseInt(formData.months || 1);
+                const basePricePerMonth = service?.basePrice || 0;
+                const basePrice = basePricePerMonth * months;
                 const taxStatus = service?.taxStatus || 'INC_IGV';
                 
                 let subtotal = basePrice;
@@ -410,8 +442,15 @@ export default function SubscriptionsPage() {
 
                 return (
                   <div className="border border-zinc-100 bg-zinc-50/50 p-5 rounded-2xl space-y-2.5">
+                    <div className="flex items-center justify-between text-zinc-500">
+                      <span className="text-[10px] font-medium uppercase tracking-widest">Costo Unitario (S/.)</span>
+                      <span className="text-[10px] font-medium tracking-tight">
+                        S/ {parseFloat(basePricePerMonth).toFixed(2)} / mes
+                      </span>
+                    </div>
+
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Servicio Base</span>
+                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Subtotal ({months} {months === 1 ? 'Mes' : 'Meses'})</span>
                       <span className="text-sm font-medium text-zinc-900 tracking-tight">
                         S/ {subtotal.toFixed(2)}
                       </span>
