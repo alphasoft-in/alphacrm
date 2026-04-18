@@ -103,7 +103,9 @@ export default function ContractsPage() {
     contactMethod: "WHATSAPP",
     paymentTerms: "50-50",
     installments: "1",
-    dealDate: new Date().toISOString().split('T')[0]
+    dealDate: new Date().toISOString().split('T')[0],
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: ""
   });
 
   useEffect(() => {
