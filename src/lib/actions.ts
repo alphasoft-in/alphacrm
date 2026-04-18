@@ -267,17 +267,13 @@ export async function getUpcomingRenewals() {
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
   try {
-    // Retorna renovaciones de los próximos 45 días, ya vencidas o sin fecha definida
+    // Retorna todas las suscripciones activas ordenadas por próxima renovación
     return await sql`
       SELECT s.id, c.name as "customerName", ser.name as "serviceName", s."nextRenewal", s.price
       FROM "Subscription" s
       JOIN "Customer" c ON s."customerId" = c.id
       JOIN "Service" ser ON s."serviceId" = ser.id
       WHERE (s.status = 'ACTIVE' OR s.status = 'active')
-      AND (
-        s."nextRenewal" IS NULL 
-        OR s."nextRenewal" <= NOW() + INTERVAL '45 days'
-      )
       ORDER BY COALESCE(s."nextRenewal", '1900-01-01') ASC
     `;
   } catch (e) { return []; }
