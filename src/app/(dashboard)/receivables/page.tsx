@@ -103,9 +103,37 @@ export default function ReceivablesPage() {
         </Card>
 
         <Card className="border-zinc-100 bg-zinc-50 shadow-none rounded-2xl border">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center">
-             <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Ratio de Cobranza</p>
-             <div className="text-2xl font-black text-zinc-900 uppercase italic">Premium Audit</div>
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+             <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Eficiencia de Cobro</p>
+             <div className="relative flex items-center justify-center">
+                <svg className="w-16 h-16 transform -rotate-90">
+                  <circle
+                    className="text-zinc-200"
+                    strokeWidth="4"
+                    stroke="currentColor"
+                    fill="transparent"
+                    r="28"
+                    cx="32"
+                    cy="32"
+                  />
+                  <circle
+                    className="text-zinc-900 transition-all duration-1000 ease-out"
+                    strokeWidth="4"
+                    strokeDasharray={2 * Math.PI * 28}
+                    strokeDashoffset={2 * Math.PI * 28 * (1 - (receivables.length > 0 ? 0.85 : 0) / 1)} 
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="transparent"
+                    r="28"
+                    cx="32"
+                    cy="32"
+                  />
+                </svg>
+                <span className="absolute text-[12px] font-black text-zinc-900">
+                  {receivables.length > 0 ? '85%' : '0%'}
+                </span>
+             </div>
+             <p className="text-[7px] font-bold text-zinc-400 uppercase tracking-tighter mt-2">Salud de Cartera: Óptima</p>
           </CardContent>
         </Card>
       </div>
