@@ -735,7 +735,7 @@ export async function getAccountsReceivable() {
       SELECT * FROM (
         -- Deuda de Contratos (Deals)
         SELECT d.id, c.name as "customerName", d.name as "description", 
-          (COALESCE(d."totalAmount", 0) - COALESCE(d."downPayment", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
+          (COALESCE(d."totalAmount", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
           d."dealDate" as "date",
           'DEAL' as source
         FROM "Deal" d
