@@ -582,7 +582,7 @@ export default function ContractsPage() {
               <Input 
                 value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Filtrado por proyecto o titular..." 
-                className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold uppercase focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
+                className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-[10px] font-semibold uppercase focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
               />
            </div>
         </CardHeader>
@@ -614,7 +614,7 @@ export default function ContractsPage() {
                   <TableRow key={deal.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors uppercase">
                     <TableCell className="py-5 pl-6">
                       <div className="flex flex-col leading-tight">
-                        <span className="text-xs font-bold text-zinc-900 tracking-tight">{deal.name}</span>
+                        <span className="text-[10px] font-bold text-zinc-900 tracking-tight">{deal.name}</span>
                         <span className="text-[9px] font-semibold text-zinc-400 mt-1.5 uppercase tracking-widest">{deal.customerName}</span>
                       </div>
                     </TableCell>
@@ -626,7 +626,7 @@ export default function ContractsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                        <div className="flex flex-col items-end gap-1.5">
-                          <div className="text-[11px] font-bold text-zinc-900 tracking-tighter">S/ {paid.toLocaleString()} <span className="text-zinc-400 font-semibold">/ S/ {deal.totalAmount.toLocaleString()}</span></div>
+                          <div className="text-[10px] font-bold text-zinc-900 tracking-tighter">S/ {paid.toLocaleString()} <span className="text-zinc-400 font-semibold">/ S/ {deal.totalAmount.toLocaleString()}</span></div>
                           <div className="w-28 bg-zinc-100 h-1 rounded-full overflow-hidden border border-zinc-100/50">
                              <div 
                                className={cn(
