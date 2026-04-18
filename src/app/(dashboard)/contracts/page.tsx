@@ -345,7 +345,7 @@ export default function ContractsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full text-sm font-bold tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
+                    className="border-none bg-transparent h-full text-sm font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
