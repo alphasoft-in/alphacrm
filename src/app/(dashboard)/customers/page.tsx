@@ -411,7 +411,7 @@ export default function CustomersPage() {
                   placeholder="Búsqueda dinámica..." 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-[10px] font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
+                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 !text-[11px] font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
                 />
              </div>
              <Button variant="outline" className="h-10 border-zinc-200 text-zinc-500 font-semibold px-4 gap-2">
@@ -451,7 +451,7 @@ export default function CustomersPage() {
                   <TableRow key={customer.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors">
                     <TableCell className="py-4 pl-6">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold text-zinc-900 leading-tight min-w-0 flex-1">{customer.name}</span>
+                        <span className="text-[11px] font-semibold text-zinc-900 leading-tight min-w-0 flex-1">{customer.name}</span>
                         <span className="text-[9px] font-medium text-zinc-400 uppercase mt-1">ID: {customer.docNumber}</span>
                       </div>
                     </TableCell>
