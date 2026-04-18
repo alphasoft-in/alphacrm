@@ -731,32 +731,39 @@ export async function getAccountsReceivable() {
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
   try {
-    const receivables = await sql`
-      SELECT * FROM (
-        -- Deuda de Contratos (Cualquiera que no esté cancelado y tenga saldo)
-        SELECT d.id, c.name as "customerName", d.name as "description", 
-          (COALESCE(d."totalAmount", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
-          d."dealDate" as "date",
-          'DEAL' as source
-        FROM "Deal" d
-        JOIN "Customer" c ON d."customerId" = c.id
-        WHERE LOWER(d.status) != 'cancelled'
-        
-        UNION ALL
-
-        -- Deuda de Suscripciones (Todas las activas)
-        SELECT s.id, c.name as "customerName", ser.name as "description",
-          COALESCE(s.price, 0) as balance,
-          s."nextRenewal" as "date",
-          'SUBSCRIPTION' as source
-        FROM "Subscription" s
-        JOIN "Customer" c ON s."customerId" = c.id
-        JOIN "Service" ser ON s."serviceId" = ser.id
-        WHERE LOWER(s.status) = 'active'
-      ) AS combined
-      WHERE balance > 0.01
-      ORDER BY "date" ASC
+    // Consulta separada para depuración y mayor fiabilidad
+    const deals = await sql`
+      SELECT d.id, c.name as "customerName", d.name as "description", 
+        (COALESCE(d."totalAmount", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
+        d."dealDate" as "date",
+        'DEAL' as source
+      FROM "Deal" d
+      JOIN "Customer" c ON d."customerId" = c.id
+      WHERE LOWER(d.status) != 'cancelled'
     `;
-    return receivables;
-  } catch (e) { return []; }
+
+    const subscriptions = await sql`
+      SELECT s.id, c.name as "customerName", ser.name as "description",
+        COALESCE(s.price, 0) as balance,
+        s."nextRenewal" as "date",
+        'SUBSCRIPTION' as source
+      FROM "Subscription" s
+      JOIN "Customer" c ON s."customerId" = c.id
+      JOIN "Service" ser ON s."serviceId" = ser.id
+      WHERE LOWER(s.status) = 'active'
+    `;
+
+    const combined = [...deals, ...subscriptions]
+      .map(item => ({
+        ...item,
+        balance: parseFloat(item.balance.toString())
+      }))
+      .filter(item => item.balance > 0.01)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return combined;
+  } catch (e) { 
+    console.error("RECEIVABLES_ERROR:", e);
+    return []; 
+  }
 }
