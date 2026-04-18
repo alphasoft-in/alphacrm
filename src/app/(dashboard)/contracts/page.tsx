@@ -396,7 +396,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-9 text-sm font-semibold shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 text-sm font-medium shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
@@ -424,25 +424,25 @@ export default function ContractsPage() {
                                 });
                             }}
                             onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                            className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-zinc-50/30" 
+                            className="pl-8 border-zinc-200 h-9 font-medium text-sm bg-zinc-50/30" 
                          />
                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha de Firma</Label>
-                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
                      </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Inicio Contrato</Label>
-                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
                      </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Fin Contrato</Label>
-                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-bold uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
                      </div>
                   </div>
 
@@ -475,7 +475,7 @@ export default function ContractsPage() {
                                 value={formData.downPayment}
                                 onChange={e => setFormData({...formData, downPayment: e.target.value})}
                                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                                className="pl-8 border-zinc-200 h-9 font-bold text-sm bg-white rounded-xl shadow-none outline-none w-full" 
+                                className="pl-8 border-zinc-200 h-9 font-medium text-sm bg-white rounded-xl shadow-none outline-none w-full" 
                              />
                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                           </div>
