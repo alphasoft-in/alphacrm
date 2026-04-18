@@ -85,7 +85,8 @@ export async function getCustomerByDoc(docNumber: string) {
     if (results.length > 0) {
       const customer = results[0];
       const subscriptions = await sql`
-        SELECT s.id, ser.name as "serviceName", s."productName"
+        SELECT s.id, ser.name as "serviceName", s."productName", s.price,
+        COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "subscriptionId" = s.id AND status = 'COMPLETED'), 0) as "paidAmount"
         FROM "Subscription" s
         JOIN "Service" ser ON s."serviceId" = ser.id
         WHERE s."customerId" = ${customer.id} AND s.status = 'ACTIVE'
@@ -361,7 +362,15 @@ export async function getSubscriptionsByCustomer(customerId: string) {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
-  try { return await sql`SELECT s.id, ser.name as "serviceName", s.price FROM "Subscription" s JOIN "Service" ser ON s."serviceId" = ser.id WHERE s."customerId" = ${customerId} AND s.status = 'ACTIVE'`; } catch (e) { return []; }
+  try { 
+    return await sql`
+      SELECT s.id, ser.name as "serviceName", s.price,
+      COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "subscriptionId" = s.id AND status = 'COMPLETED'), 0) as "paidAmount"
+      FROM "Subscription" s 
+      JOIN "Service" ser ON s."serviceId" = ser.id 
+      WHERE s."customerId" = ${customerId} AND s.status = 'ACTIVE'
+    `; 
+  } catch (e) { return []; }
 }
 
 export async function getDealsByCustomer(customerId: string) {

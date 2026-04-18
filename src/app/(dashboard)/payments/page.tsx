@@ -339,14 +339,23 @@ export default function PaymentsPage() {
                 <div className="grid grid-cols-2 gap-4 animate-in fade-in">
                    <div className="space-y-1.5">
                       <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Vincular Suscripción</Label>
-                      <Select value={formData.subscriptionId} onValueChange={v => setFormData({...formData, subscriptionId: v, dealId: ""})}>
+                      <Select value={formData.subscriptionId} onValueChange={v => {
+                         const sub = customerEntities.subs.find(s => s.id === v);
+                         const balance = sub ? Math.max(0, parseFloat(sub.price) - parseFloat(sub.paidAmount)) : 0;
+                         setFormData({...formData, subscriptionId: v, dealId: "", amount: balance > 0 ? balance.toString() : formData.amount});
+                      }}>
                          <SelectTrigger className="border-zinc-200 h-10 text-[10px] font-bold uppercase bg-zinc-50/30 shadow-none">
                             <SelectValue placeholder="---" />
                          </SelectTrigger>
                          <SelectContent className="bg-white rounded-xl border-zinc-200">
-                            {customerEntities.subs.map(s => (
-                               <SelectItem key={s.id} value={s.id} className="text-[10px] font-bold uppercase py-2">{s.serviceName} (S/ {s.price})</SelectItem>
-                            ))}
+                            {customerEntities.subs.map(s => {
+                               const balance = Math.max(0, parseFloat(s.price) - parseFloat(s.paidAmount));
+                               return (
+                                  <SelectItem key={s.id} value={s.id} className="text-[10px] font-bold uppercase py-2">
+                                     {s.serviceName} (SALDO: S/ {balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })})
+                                  </SelectItem>
+                               );
+                            })}
                          </SelectContent>
                       </Select>
                    </div>

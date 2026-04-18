@@ -361,19 +361,28 @@ export default function PettyCashPage() {
                         <Select 
                           value={formData.subscriptionId} 
                           onValueChange={(val) => {
-                            const sub = customerSubscriptions.find(s => s.id === val);
-                            setFormData({...formData, subscriptionId: val, description: `AMORTIZACIÓN - ${sub?.productName || sub?.serviceName}`.toUpperCase()});
-                          }}
+                             const sub = customerSubscriptions.find(s => s.id === val);
+                             const balance = sub ? Math.max(0, parseFloat(sub.price) - parseFloat(sub.paidAmount)) : 0;
+                             setFormData({
+                               ...formData, 
+                               subscriptionId: val, 
+                               amount: balance > 0 ? balance.toString() : formData.amount,
+                               description: `AMORTIZACIÓN - ${sub?.productName || sub?.serviceName}`.toUpperCase()
+                             });
+                           }}
                         >
                            <SelectTrigger className="h-10 border-zinc-100 bg-zinc-50/10 focus:ring-zinc-900 rounded-xl font-bold text-[10px] md:text-[10px] uppercase w-full">
                               <SelectValue placeholder="LISTA DE PROYECTOS VINCULADOS" />
                            </SelectTrigger>
                            <SelectContent className="rounded-xl border-zinc-100 bg-white shadow-none ">
-                              {customerSubscriptions.map(sub => (
-                                <SelectItem key={sub.id} value={sub.id} className="text-[10px] md:text-[10px] font-bold py-2.5 uppercase tracking-wide">
-                                   {sub.productName || sub.serviceName}
-                                </SelectItem>
-                              ))}
+                              {customerSubscriptions.map(sub => {
+                                 const balance = Math.max(0, parseFloat(sub.price) - parseFloat(sub.paidAmount));
+                                 return (
+                                   <SelectItem key={sub.id} value={sub.id} className="text-[10px] md:text-[10px] font-bold py-2.5 uppercase tracking-wide">
+                                      {sub.productName || sub.serviceName} (SALDO: S/ {balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })})
+                                   </SelectItem>
+                                 );
+                              })}
                            </SelectContent>
                         </Select>
                      </div>
