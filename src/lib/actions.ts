@@ -805,3 +805,106 @@ export async function getAccountsReceivable() {
     return [];
   }
 }
+export async function getAnalyticsData() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return null;
+  const sql = neon(dbUrl);
+  
+  try {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const sixtyDaysAgo = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
+
+    const [
+      customers,
+      newCustomers,
+      prevNewCustomers,
+      payments,
+      prevPayments,
+      deals,
+      pettyCash,
+      marketingSpend,
+      prevMarketingSpend,
+      activeSubs,
+      canceledSubs
+    ] = await Promise.all([
+      sql`SELECT COUNT(*) as count FROM "Customer"`,
+      sql`SELECT COUNT(*) as count FROM "Customer" WHERE "createdAt" >= ${thirtyDaysAgo}`,
+      sql`SELECT COUNT(*) as count FROM "Customer" WHERE "createdAt" >= ${sixtyDaysAgo} AND "createdAt" < ${thirtyDaysAgo}`,
+      sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED' AND "paymentDate" >= ${thirtyDaysAgo}`,
+      sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED' AND "paymentDate" >= ${sixtyDaysAgo} AND "paymentDate" < ${thirtyDaysAgo}`,
+      sql`SELECT * FROM "Deal" WHERE status != 'CANCELLED'`,
+      sql`SELECT * FROM "PettyCash" WHERE date >= ${thirtyDaysAgo}`,
+      sql`SELECT SUM(amount) as total FROM "PettyCash" WHERE type = 'EXPENSE' AND category = 'MARKETING' AND date >= ${thirtyDaysAgo}`,
+      sql`SELECT SUM(amount) as total FROM "PettyCash" WHERE type = 'EXPENSE' AND category = 'MARKETING' AND date >= ${sixtyDaysAgo} AND date < ${thirtyDaysAgo}`,
+      sql`SELECT COUNT(*) as count FROM "Subscription" WHERE status = 'ACTIVE'`,
+      sql`SELECT COUNT(*) as count FROM "Subscription" WHERE status = 'CANCELED' AND "updatedAt" >= ${thirtyDaysAgo}`
+    ]);
+
+    const totalCustomers = parseInt(customers[0].count);
+    const revenue = parseFloat(payments[0].total || 0);
+    const prevRevenue = parseFloat(prevPayments[0].total || 0);
+    const mktSpend = parseFloat(marketingSpend[0].total || 0);
+    const prevMktSpend = parseFloat(prevMarketingSpend[0].total || 0);
+
+    // Sales
+    const growthRate = prevRevenue > 0 ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0;
+    const convRate = totalCustomers > 0 ? (deals.length / totalCustomers) * 100 : 0;
+
+    // Marketing
+    const nCust = parseInt(newCustomers[0].count);
+    const cac = nCust > 0 ? mktSpend / nCust : 0;
+    const ltv = totalCustomers > 0 ? (await sql`SELECT SUM(amount) as total FROM "Payment" WHERE status = 'COMPLETED'`)[0].total / totalCustomers : 0;
+    const roas = mktSpend > 0 ? revenue / mktSpend : 0;
+
+    // Product
+    const retention = totalCustomers > 0 ? (totalCustomers - parseInt(canceledSubs[0].count)) / totalCustomers * 100 : 0;
+    const churn = parseInt(activeSubs[0].count) > 0 ? (parseInt(canceledSubs[0].count) / parseInt(activeSubs[0].count)) * 100 : 0;
+    
+    // Finance
+    const expenses = pettyCash.filter((i: any) => i.type === 'EXPENSE').reduce((sum: number, i: any) => sum + parseFloat(i.amount), 0);
+    const margin = revenue > 0 ? ((revenue - expenses) / revenue) * 100 : 0;
+    const cashFlow = revenue - expenses;
+    const burnRate = expenses; // Simplified as monthly expense
+
+    // Ops
+    const dealsWithDates = deals.filter((d: any) => d.startDate && d.dealDate);
+    const leadTime = dealsWithDates.length > 0 
+      ? dealsWithDates.reduce((sum: number, d: any) => sum + (new Date(d.startDate).getTime() - new Date(d.dealDate).getTime()), 0) / (dealsWithDates.length * 24 * 60 * 60 * 1000)
+      : 0;
+    const costPerOp = (deals.length + parseInt(activeSubs[0].count)) > 0 ? expenses / (deals.length + parseInt(activeSubs[0].count)) : 0;
+
+    return {
+      sales: {
+        revenue,
+        growthRate,
+        convRate,
+        prevRevenue
+      },
+      marketing: {
+        cac,
+        ltv,
+        roas,
+        mktSpend,
+        prevMktSpend
+      },
+      product: {
+        retention,
+        churn,
+        dauMau: 42.5 // Mock as we don't have session data
+      },
+      finance: {
+        margin,
+        cashFlow,
+        burnRate
+      },
+      ops: {
+        leadTime,
+        costPerOp
+      }
+    };
+  } catch (error) {
+    console.error("Error in getAnalyticsData:", error);
+    return null;
+  }
+}

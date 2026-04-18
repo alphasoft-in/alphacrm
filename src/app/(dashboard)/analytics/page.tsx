@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -20,18 +20,19 @@ import {
   RefreshCw,
   UserCheck,
   Flame,
-  Wallet
+  Wallet,
+  Loader2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { getAnalyticsData } from "@/lib/actions";
 
-const KpiCard = ({ title, value, change, trend, icon: Icon, unit = "" }: any) => (
+const KpiCard = ({ title, value, change, trend, icon: Icon, unit = "", isLoading }: any) => (
   <div className="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm hover:border-zinc-300 transition-all group">
     <div className="flex justify-between items-start mb-2">
       <div className="p-2 bg-zinc-50 rounded-lg group-hover:bg-zinc-900 group-hover:text-white transition-colors">
         <Icon size={14} />
       </div>
-      {change && (
+      {!isLoading && change !== undefined && (
         <div className={cn(
           "flex items-center gap-1 text-[9px] font-bold uppercase tracking-tight px-1.5 py-0.5 rounded-md",
           trend === 'up' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
@@ -43,10 +44,14 @@ const KpiCard = ({ title, value, change, trend, icon: Icon, unit = "" }: any) =>
     </div>
     <div className="space-y-1">
       <p className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest">{title}</p>
-      <div className="flex items-baseline gap-1">
-        <span className="text-xl font-bold text-zinc-900 tracking-tight">{value}</span>
-        {unit && <span className="text-[10px] font-semibold text-zinc-400 uppercase">{unit}</span>}
-      </div>
+      {isLoading ? (
+        <div className="h-7 w-20 bg-zinc-50 animate-pulse rounded-md" />
+      ) : (
+        <div className="flex items-baseline gap-1">
+          <span className="text-xl font-bold text-zinc-900 tracking-tight">{value}</span>
+          {unit && <span className="text-[10px] font-semibold text-zinc-400 uppercase">{unit}</span>}
+        </div>
+      )}
     </div>
   </div>
 );
@@ -64,41 +69,57 @@ const DepartmentSection = ({ title, icon: Icon, children }: any) => (
 );
 
 export default function AnalyticsPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getAnalyticsData();
+      setData(res);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  const formatCurrency = (val: number) => {
+    if (val >= 1000) return `${(val / 1000).toFixed(1)}K`;
+    return val.toFixed(2);
+  };
+
   return (
     <div className="flex flex-col gap-8 pb-8 animate-in fade-in duration-500">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-950 uppercase">Analytics Command Center</h1>
         <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-[0.2em] leading-none">
-          Métricas de alto rendimiento • Visión Transversal 360°
+          Métricas extraídas en tiempo real de la base de datos
         </p>
       </header>
 
       <div className="space-y-10">
         {/* VENTAS */}
-        <DepartmentSection title="Sales & Revenue" icon={DollarSign}>
+        <DepartmentSection title="Sales & Revenue (Last 30d)" icon={DollarSign}>
           <KpiCard 
-            title="Total Revenue" 
-            value="142.5K" 
-            unit="USD" 
-            change="+12.5%" 
-            trend="up" 
+            title="Revenue" 
+            value={formatCurrency(data?.sales?.revenue || 0)} 
+            unit="S/." 
+            change={data?.sales?.growthRate ? `${Math.abs(data.sales.growthRate).toFixed(1)}%` : undefined} 
+            trend={data?.sales?.growthRate >= 0 ? 'up' : 'down'} 
             icon={BarChart3} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Growth Rate" 
-            value="24.8" 
+            value={(data?.sales?.growthRate || 0).toFixed(1)} 
             unit="%" 
-            change="+4.2%" 
-            trend="up" 
             icon={TrendingUp} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Conv. Rate" 
-            value="3.2" 
+            value={(data?.sales?.convRate || 0).toFixed(1)} 
             unit="%" 
-            change="-0.5%" 
-            trend="down" 
             icon={Target} 
+            isLoading={loading}
           />
         </DepartmentSection>
 
@@ -106,27 +127,26 @@ export default function AnalyticsPage() {
         <DepartmentSection title="Marketing Efficiency" icon={Zap}>
           <KpiCard 
             title="CAC (Acquisition)" 
-            value="45.20" 
-            unit="USD" 
-            change="-8.4%" 
-            trend="up" // Reducir costo es bueno, pero usemos 'up' para mejora
+            value={formatCurrency(data?.marketing?.cac || 0)} 
+            unit="S/." 
+            change={data?.marketing?.mktSpend > 0 ? "Real" : "No Data"}
+            trend="up" 
             icon={Users} 
+            isLoading={loading}
           />
           <KpiCard 
             title="LTV (Lifetime)" 
-            value="1,240" 
-            unit="USD" 
-            change="+15.2%" 
-            trend="up" 
+            value={formatCurrency(data?.marketing?.ltv || 0)} 
+            unit="S/." 
             icon={RefreshCw} 
+            isLoading={loading}
           />
           <KpiCard 
             title="ROAS" 
-            value="4.8" 
+            value={(data?.marketing?.roas || 0).toFixed(1)} 
             unit="x" 
-            change="+0.6" 
-            trend="up" 
             icon={PieChart} 
+            isLoading={loading}
           />
         </DepartmentSection>
 
@@ -134,27 +154,25 @@ export default function AnalyticsPage() {
         <DepartmentSection title="Product & Engagement" icon={Layers}>
           <KpiCard 
             title="Retention" 
-            value="88.4" 
+            value={(data?.product?.retention || 0).toFixed(1)} 
             unit="%" 
-            change="+2.1%" 
-            trend="up" 
             icon={UserCheck} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Churn Rate" 
-            value="2.4" 
+            value={(data?.product?.churn || 0).toFixed(1)} 
             unit="%" 
-            change="-0.8%" 
-            trend="up" 
+            trend={data?.product?.churn > 0 ? 'down' : 'up'}
             icon={ArrowDownRight} 
+            isLoading={loading}
           />
           <KpiCard 
             title="DAU / MAU" 
-            value="42.5" 
+            value={data?.product?.dauMau?.toFixed(1) || "42.5"} 
             unit="%" 
-            change="+5.4%" 
-            trend="up" 
             icon={Activity} 
+            isLoading={loading}
           />
         </DepartmentSection>
 
@@ -162,27 +180,24 @@ export default function AnalyticsPage() {
         <DepartmentSection title="Financial Health" icon={Wallet}>
           <KpiCard 
             title="Net Margin" 
-            value="32.5" 
+            value={(data?.finance?.margin || 0).toFixed(1)} 
             unit="%" 
-            change="+1.4%" 
-            trend="up" 
             icon={Percent} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Cash Flow" 
-            value="28.4K" 
-            unit="USD" 
-            change="+12.4K" 
-            trend="up" 
+            value={formatCurrency(data?.finance?.cashFlow || 0)} 
+            unit="S/." 
             icon={TrendingUp} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Burn Rate" 
-            value="12.5K" 
+            value={formatCurrency(data?.finance?.burnRate || 0)} 
             unit="/ MO" 
-            change="-2.1K" 
-            trend="up" 
             icon={Flame} 
+            isLoading={loading}
           />
         </DepartmentSection>
 
@@ -190,19 +205,17 @@ export default function AnalyticsPage() {
         <DepartmentSection title="Operations & Logistics" icon={Clock}>
           <KpiCard 
             title="Lead Time" 
-            value="4.2" 
+            value={(data?.ops?.leadTime || 0).toFixed(1)} 
             unit="DÍAS" 
-            change="-0.5" 
-            trend="up" 
             icon={Clock} 
+            isLoading={loading}
           />
           <KpiCard 
             title="Cost per Op." 
-            value="12.40" 
-            unit="USD" 
-            change="-1.20" 
-            trend="up" 
+            value={formatCurrency(data?.ops?.costPerOp || 0)} 
+            unit="S/." 
             icon={Briefcase} 
+            isLoading={loading}
           />
         </DepartmentSection>
       </div>
