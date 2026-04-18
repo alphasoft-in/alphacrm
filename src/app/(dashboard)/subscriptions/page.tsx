@@ -153,7 +153,7 @@ export default function SubscriptionsPage() {
   };
 
   const handleEdit = (sub: any) => {
-    const formattedDocType = (sub.docType || "DNI").trim().toUpperCase();
+    const formattedDocType = (sub.docType || "dni").trim().toLowerCase();
     setFormData({
       id: sub.id,
       customerId: sub.customerId,
@@ -305,14 +305,14 @@ export default function SubscriptionsPage() {
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Identificar Cliente</Label>
                 <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-12 bg-white focus-within:border-zinc-400 transition-all shadow-sm focus-within:shadow-md">
                   <Select value={formData.docType} onValueChange={v => setFormData({...formData, docType: v})}>
-                    <SelectTrigger className="w-[110px] border-none rounded-none font-bold text-xs focus:ring-0 uppercase h-full bg-zinc-50/50 border-r border-zinc-100 px-4">
+                    <SelectTrigger className="w-[110px] border-none rounded-none font-semibold text-xs focus:ring-0 uppercase h-full bg-zinc-50/50 border-r border-zinc-100 px-4">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dni" className="text-xs uppercase font-bold">DNI</SelectItem>
-                      <SelectItem value="ruc" className="text-xs uppercase font-bold">RUC</SelectItem>
-                      <SelectItem value="ce" className="text-xs uppercase font-bold">C. Extranjería</SelectItem>
-                      <SelectItem value="pasaporte" className="text-xs uppercase font-bold">Pasaporte</SelectItem>
+                      <SelectItem value="dni" className="text-xs uppercase font-semibold">DNI</SelectItem>
+                      <SelectItem value="ruc" className="text-xs uppercase font-semibold">RUC</SelectItem>
+                      <SelectItem value="ce" className="text-xs uppercase font-semibold">C. Extranjería</SelectItem>
+                      <SelectItem value="pasaporte" className="text-xs uppercase font-semibold">Pasaporte</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input 
@@ -323,7 +323,7 @@ export default function SubscriptionsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full text-sm font-bold tracking-tight focus-visible:ring-0 flex-1 px-5"
+                    className="border-none bg-transparent h-full text-sm font-medium tracking-tight focus-visible:ring-0 flex-1 px-5"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
