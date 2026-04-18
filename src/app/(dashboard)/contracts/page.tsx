@@ -345,7 +345,7 @@ export default function ContractsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full !text-[9px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
+                    className="border-none bg-transparent h-full !text-[10px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
@@ -396,7 +396,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-9 !text-[9px] font-medium shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 !text-[10px] font-medium shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
@@ -404,7 +404,7 @@ export default function ContractsPage() {
                      <textarea 
                         value={formData.description}
                         onChange={e => setFormData({...formData, description: e.target.value.toUpperCase()})}
-                        className="w-full border border-zinc-200 bg-zinc-50/30 min-h-[110px] p-4 !text-[9px] font-medium rounded-xl focus:outline-none transition-all outline-none uppercase leading-relaxed resize-none"
+                        className="w-full border border-zinc-200 bg-zinc-50/30 min-h-[110px] p-4 !text-[10px] font-medium rounded-xl focus:outline-none transition-all outline-none uppercase leading-relaxed resize-none"
                      />
                   </div>
 
@@ -424,22 +424,22 @@ export default function ContractsPage() {
                                 });
                             }}
                             onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                            className="pl-8 border-zinc-200 h-9 font-medium text-sm bg-zinc-50/30" 
+                            className="pl-8 border-zinc-200 h-9 font-medium !text-[10px] bg-zinc-50/30" 
                          />
                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha de Firma</Label>
-                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Inicio Contrato</Label>
-                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Fin Contrato</Label>
-                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                   </div>
 
@@ -472,7 +472,7 @@ export default function ContractsPage() {
                                 value={formData.downPayment}
                                 onChange={e => setFormData({...formData, downPayment: e.target.value})}
                                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                                className="pl-8 border-zinc-200 h-9 font-medium text-sm bg-white rounded-xl shadow-none outline-none w-full" 
+                                className="pl-8 border-zinc-200 h-9 font-medium !text-[10px] bg-white rounded-xl shadow-none outline-none w-full" 
                              />
                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                           </div>
