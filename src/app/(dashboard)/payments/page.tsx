@@ -522,7 +522,7 @@ export default function PaymentsPage() {
                   <TableCell>
                     <div className="flex flex-col leading-tight">
                        <span className="text-sm font-bold text-zinc-900 tracking-tighter">S/ {payment.amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
-                       <span className="text-[9px] text-zinc-400 font-semibold mt-1 uppercase">{new Date(payment.paymentDate).toLocaleDateString()}</span>
+                       <span className="text-[9px] text-zinc-400 font-semibold mt-1 uppercase">{new Date(payment.paymentDate).toLocaleDateString('es-PE')}</span>
                     </div>
                   </TableCell>
                   <TableCell>

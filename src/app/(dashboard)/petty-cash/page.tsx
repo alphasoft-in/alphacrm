@@ -545,7 +545,7 @@ export default function PettyCashPage() {
                     <TableRow key={m.id} className="border-zinc-100  uppercase">
                        <TableCell className="py-4 pl-7 text-zinc-500 whitespace-nowrap">
                           <div className="flex flex-col">
-                             <span className="text-[11px] font-semibold text-zinc-900 tracking-tight">{new Date(m.date).toLocaleDateString()}</span>
+                             <span className="text-[11px] font-semibold text-zinc-900 tracking-tight">{new Date(m.date).toLocaleDateString('es-PE')}</span>
                              <span className="text-[9px] font-medium opacity-60">{new Date(m.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                        </TableCell>

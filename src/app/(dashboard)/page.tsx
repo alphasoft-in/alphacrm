@@ -125,7 +125,7 @@ export default async function Dashboard() {
                       <span className="text-[8px] font-medium text-zinc-400 truncate uppercase tracking-widest">{act.serviceName}</span>
                    </div>
                    <div className="flex flex-col items-end">
-                      <span className="text-[8px] font-bold text-zinc-500 uppercase">{new Date(act.date).toLocaleDateString()}</span>
+                      <span className="text-[8px] font-bold text-zinc-500 uppercase">{new Date(act.date).toLocaleDateString('es-PE')}</span>
                    </div>
                 </div>
              ))}

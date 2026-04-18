@@ -169,7 +169,7 @@ export default function ReceivablesPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className={`text-[10px] font-medium ${isOverdue ? 'text-rose-600' : 'text-zinc-500'}`}>{new Date(r.date).toLocaleDateString()}</span>
+                        <span className={`text-[10px] font-medium ${isOverdue ? 'text-rose-600' : 'text-zinc-500'}`}>{new Date(r.date).toLocaleDateString('es-PE')}</span>
                         {isOverdue && <span className="text-[7px] font-black bg-rose-600 text-white px-1.5 rounded-full uppercase tracking-tighter">MORA</span>}
                       </div>
                     </TableCell>
