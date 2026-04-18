@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { 
-  ArrowUpRight, 
-  Search, 
-  Calendar, 
-  Users, 
-  DollarSign, 
+import {
+  ArrowUpRight,
+  Search,
+  Calendar,
+  Users,
+  DollarSign,
   AlertTriangle,
   FileText,
   Clock,
@@ -19,13 +19,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { getAccountsReceivable } from "@/lib/actions";
@@ -46,7 +46,7 @@ export default function ReceivablesPage() {
     fetchData();
   }, []);
 
-  const filteredReceivables = receivables.filter(r => 
+  const filteredReceivables = receivables.filter(r =>
     r.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -67,7 +67,7 @@ export default function ReceivablesPage() {
         <div className="flex gap-3 items-center">
           <div className="relative flex-1 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={14} />
-            <input 
+            <input
               type="text"
               placeholder="BUSCAR CLIENTE O SERVICIO..."
               value={searchTerm}
@@ -82,10 +82,10 @@ export default function ReceivablesPage() {
         <Card className="border-zinc-100 bg-zinc-900 shadow-none rounded-2xl border col-span-1 md:col-span-1">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-               <div className="p-1.5 bg-zinc-800 rounded-lg text-white">
-                  <TrendingUp size={14} />
-               </div>
-               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Deuda Total</span>
+              <div className="p-1.5 bg-zinc-800 rounded-lg text-white">
+                <TrendingUp size={14} />
+              </div>
+              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Deuda Total</span>
             </div>
             <h3 className="text-2xl font-medium tracking-tighter text-white">S/ {totalReceivable.toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
           </CardContent>
@@ -94,10 +94,10 @@ export default function ReceivablesPage() {
         <Card className="border-zinc-100 bg-white shadow-none rounded-2xl border">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-               <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
-                  <CheckCircle2 size={14} />
-               </div>
-               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vigente</span>
+              <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
+                <CheckCircle2 size={14} />
+              </div>
+              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vigente</span>
             </div>
             <h3 className="text-2xl font-medium tracking-tighter text-zinc-900">S/ {receivables.filter(r => new Date(r.date) >= new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0).toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
             <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">Dentro del plazo</p>
@@ -107,10 +107,10 @@ export default function ReceivablesPage() {
         <Card className="border-zinc-100 bg-white shadow-none rounded-2xl border">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-               <div className="p-1.5 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
-                  <AlertTriangle size={14} />
-               </div>
-               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vencida</span>
+              <div className="p-1.5 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
+                <AlertTriangle size={14} />
+              </div>
+              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vencida</span>
             </div>
             <h3 className="text-2xl font-medium tracking-tighter text-rose-600">S/ {receivables.filter(r => new Date(r.date) < new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0).toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
             <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">{overdueCount} compromisos en mora</p>
@@ -119,24 +119,24 @@ export default function ReceivablesPage() {
 
         <Card className="border-zinc-100 bg-zinc-50 shadow-none rounded-2xl border">
           <CardContent className="p-5 text-center flex flex-col items-center justify-center h-full">
-             <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Eficiencia</p>
-             <div className="relative flex items-center justify-center">
-                <svg className="w-12 h-12 transform -rotate-90">
-                  <circle className="text-zinc-200" strokeWidth="3" stroke="currentColor" fill="transparent" r="20" cx="24" cy="24" />
-                  <circle
-                    className="text-zinc-900 transition-all duration-1000 ease-out"
-                    strokeWidth="3"
-                    strokeDasharray={2 * Math.PI * 20}
-                    strokeDashoffset={2 * Math.PI * 20 * (1 - (receivables.length > 0 ? 0.85 : 0) / 1)} 
-                    strokeLinecap="round"
-                    stroke="currentColor" fill="transparent" r="20" cx="24" cy="24"
-                  />
-                </svg>
-                <span className="absolute text-[9px] font-black text-zinc-900">85%</span>
-             </div>
+            <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Eficiencia</p>
+            <div className="relative flex items-center justify-center">
+              <svg className="w-12 h-12 transform -rotate-90">
+                <circle className="text-zinc-200" strokeWidth="3" stroke="currentColor" fill="transparent" r="20" cx="24" cy="24" />
+                <circle
+                  className="text-zinc-900 transition-all duration-1000 ease-out"
+                  strokeWidth="3"
+                  strokeDasharray={2 * Math.PI * 20}
+                  strokeDashoffset={2 * Math.PI * 20 * (1 - (receivables.length > 0 ? 0.85 : 0) / 1)}
+                  strokeLinecap="round"
+                  stroke="currentColor" fill="transparent" r="20" cx="24" cy="24"
+                />
+              </svg>
+              <span className="absolute text-[9px] font-black text-zinc-900">85%</span>
+            </div>
           </CardContent>
         </Card>
-      </div>>
+      </div>
 
       <Card className="border-zinc-100 shadow-none rounded-2xl overflow-hidden border">
         <CardContent className="p-0">
@@ -172,16 +172,16 @@ export default function ReceivablesPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                       <div className="flex flex-col items-center gap-1">
+                      <div className="flex flex-col items-center gap-1">
                         <span className={`text-[10px] font-bold ${isOverdue ? 'text-rose-600' : 'text-zinc-500'}`}>{new Date(r.date).toLocaleDateString()}</span>
                         {isOverdue && <span className="text-[7px] font-black bg-rose-600 text-white px-1.5 rounded-full uppercase tracking-tighter">MORA</span>}
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-8">
-                       <div className="flex flex-col items-end">
+                      <div className="flex flex-col items-end">
                         <span className="text-sm font-bold text-zinc-950 tracking-tighter">S/ {parseFloat(r.balance).toFixed(2)}</span>
                         <span className="text-[7px] font-bold text-zinc-400 uppercase tracking-widest">Saldo de Cobro</span>
-                       </div>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
