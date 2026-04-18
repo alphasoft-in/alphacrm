@@ -291,7 +291,7 @@ export default function SubscriptionsPage() {
           </DialogTrigger>
           <DialogContent 
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="border-zinc-200 bg-white text-zinc-950 shadow-2xl sm:max-w-[700px] p-0 overflow-hidden rounded-2xl"
+            className="border-zinc-200 bg-white text-zinc-950 shadow-2xl sm:max-w-[650px] p-0 overflow-hidden rounded-2xl max-h-[95vh] flex flex-col"
           >
             <DialogHeader className="px-7 py-4 bg-zinc-50/50 border-b border-zinc-100 flex flex-row items-center justify-between space-y-0 text-left">
               <div className="flex flex-col">
@@ -304,7 +304,7 @@ export default function SubscriptionsPage() {
               </div>
             </DialogHeader>
             
-            <div className="p-6 grid gap-4">
+            <div className="p-5 grid gap-3 flex-1 overflow-y-auto custom-scrollbar">
               {/* Cliente */}
               <div className="space-y-1.5">
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Identificar Cliente</Label>
@@ -459,33 +459,33 @@ export default function SubscriptionsPage() {
                 }
 
                 return (
-                  <div className="border border-zinc-100 bg-zinc-50/50 p-5 rounded-2xl space-y-2.5">
+                  <div className="border border-zinc-100 bg-zinc-50/30 p-4 rounded-xl space-y-2">
                     <div className="flex items-center justify-between text-zinc-500">
-                      <span className="text-[10px] font-medium uppercase tracking-widest">Costo Unitario (S/.)</span>
-                      <span className="text-[10px] font-medium tracking-tight">
+                      <span className="text-[9px] font-medium uppercase tracking-widest">Costo Unitario (S/.)</span>
+                      <span className="text-[9px] font-medium tracking-tight">
                         S/ {parseFloat(basePricePerMonth).toFixed(2)} / mes
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Subtotal ({months} {months === 1 ? 'Mes' : 'Meses'})</span>
-                      <span className="text-sm font-medium text-zinc-900 tracking-tight">
+                      <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-widest">Subtotal ({months} {months === 1 ? 'Mes' : 'Meses'})</span>
+                      <span className="text-xs font-medium text-zinc-900 tracking-tight">
                         S/ {subtotal.toFixed(2)}
                       </span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">
+                      <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-widest">
                         IGV (18%) {taxStatus === 'INC_IGV' && <span className="text-[8px] lowercase font-normal">(incluido)</span>}
                       </span>
-                      <span className="text-sm font-medium text-zinc-500 tracking-tight">
+                      <span className="text-xs font-medium text-zinc-500 tracking-tight">
                         S/ {igvAmount.toFixed(2)}
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between pt-2.5 border-t border-zinc-200/60">
-                      <span className="text-[10px] font-semibold text-zinc-900 uppercase tracking-widest">Total Estimado</span>
-                      <span className="text-lg font-semibold text-zinc-950 tracking-tighter">
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60">
+                      <span className="text-[9px] font-semibold text-zinc-900 uppercase tracking-widest">Total Estimado</span>
+                      <span className="text-base font-semibold text-zinc-950 tracking-tighter">
                         S/ {total.toFixed(2)}
                       </span>
                     </div>
