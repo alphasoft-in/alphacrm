@@ -336,7 +336,7 @@ export default function CustomersPage() {
                     <Input 
                       value={docNumber || ""}
                       onChange={(e) => setDocNumber(e.target.value)}
-                      className="border-none h-10 pl-3 flex-1 text-sm font-semibold tracking-tight focus-visible:ring-0 shadow-none" 
+                      className="border-none bg-transparent h-full !text-[11px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
                       placeholder="..."
                     />
                     <Button 
@@ -358,7 +358,7 @@ export default function CustomersPage() {
                   <Input 
                     value={customerData.name || ""}
                     onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
-                    className="border-zinc-100 h-10 text-sm font-semibold bg-zinc-50/30" 
+                    className="border-zinc-100 h-10 !text-[11px] font-semibold bg-zinc-50/30 uppercase" 
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -367,7 +367,7 @@ export default function CustomersPage() {
                     <Input 
                       value={customerData.phone || ""}
                       onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
-                      className="border-zinc-100 h-10 text-sm font-semibold bg-zinc-50/30" 
+                      className="border-zinc-100 h-10 !text-[11px] font-semibold bg-zinc-50/30 uppercase" 
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -375,7 +375,7 @@ export default function CustomersPage() {
                     <Input 
                       value={customerData.email || ""}
                       onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
-                      className="border-zinc-100 h-10 text-sm font-semibold bg-zinc-50/30" 
+                      className="border-zinc-100 h-10 !text-[11px] font-semibold bg-zinc-50/30 uppercase" 
                     />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function CustomersPage() {
                   placeholder="Búsqueda dinámica..." 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-xs font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
+                  className="pl-9 h-10 border-zinc-200 bg-zinc-50/50 text-[10px] font-semibold focus-visible:ring-1 focus-visible:ring-zinc-900 transition-all rounded-xl"
                 />
              </div>
              <Button variant="outline" className="h-10 border-zinc-200 text-zinc-500 font-semibold px-4 gap-2">
@@ -451,7 +451,7 @@ export default function CustomersPage() {
                   <TableRow key={customer.id} className="border-zinc-100 hover:bg-zinc-50/30 transition-colors">
                     <TableCell className="py-4 pl-6">
                       <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-zinc-900 leading-tight min-w-0 flex-1">{customer.name}</span>
+                        <span className="text-[10px] font-semibold text-zinc-900 leading-tight min-w-0 flex-1">{customer.name}</span>
                         <span className="text-[9px] font-medium text-zinc-400 uppercase mt-1">ID: {customer.docNumber}</span>
                       </div>
                     </TableCell>
