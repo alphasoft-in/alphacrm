@@ -96,9 +96,10 @@ export default function ReceivablesPage() {
                <div className="p-2 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
                   <AlertTriangle size={16} />
                </div>
-               <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Registros Morosos</span>
+               <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vencida (Mora)</span>
             </div>
-            <h3 className="text-3xl font-medium tracking-tighter text-rose-600">{overdueCount} <span className="text-xs uppercase font-bold text-zinc-400 tracking-widest">Clientes</span></h3>
+            <h3 className="text-3xl font-medium tracking-tighter text-rose-600">S/ {receivables.filter(r => new Date(r.date) < new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0).toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
+            <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mt-1">{overdueCount} {overdueCount === 1 ? 'Compromiso Pendiente' : 'Compromisos Pendientes'}</p>
           </CardContent>
         </Card>
 
