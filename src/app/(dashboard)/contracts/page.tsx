@@ -319,7 +319,7 @@ export default function ContractsPage() {
               </div>
             </DialogHeader>
             
-            <div className="p-6 grid gap-4 max-h-[70vh] overflow-y-auto uppercase">
+            <div className="p-6 grid gap-4 max-h-[70vh] overflow-y-auto uppercase scrollbar-none">
                <div className="space-y-1.5">
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Parte Contratante</Label>
                 <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-10 bg-zinc-50/30 focus-within:border-zinc-400 transition-all shadow-sm">
@@ -327,14 +327,14 @@ export default function ContractsPage() {
                     setFormData({...formData, docType: v, docNumber: "", customerId: ""});
                     setFoundCustomer(null);
                   }}>
-                    <SelectTrigger className="w-[140px] border-none rounded-none font-medium text-[10px] focus:ring-0 uppercase h-full bg-zinc-100/50 border-r border-zinc-100 px-4">
+                    <SelectTrigger className="w-[140px] border-none rounded-none font-medium !text-[11px] focus:ring-0 uppercase h-full bg-zinc-100/50 border-r border-zinc-100 px-4">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-zinc-100">
-                      <SelectItem value="dni" className="text-[10px] uppercase font-medium">DNI</SelectItem>
-                      <SelectItem value="ruc" className="text-[10px] uppercase font-medium">RUC</SelectItem>
-                      <SelectItem value="ce" className="text-[10px] uppercase font-medium">C. Extranjería</SelectItem>
-                      <SelectItem value="pasaporte" className="text-[10px] uppercase font-medium">Pasaporte</SelectItem>
+                      <SelectItem value="dni" className="!text-[11px] uppercase font-medium">DNI</SelectItem>
+                      <SelectItem value="ruc" className="!text-[11px] uppercase font-medium">RUC</SelectItem>
+                      <SelectItem value="ce" className="!text-[11px] uppercase font-medium">C. Extranjería</SelectItem>
+                      <SelectItem value="pasaporte" className="!text-[11px] uppercase font-medium">Pasaporte</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input 
@@ -345,7 +345,7 @@ export default function ContractsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full !text-[10px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
+                    className="border-none bg-transparent h-full !text-[11px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
@@ -384,7 +384,7 @@ export default function ContractsPage() {
                       value={foundCustomer?.address || ''} 
                       onChange={e => setFoundCustomer({...foundCustomer, address: e.target.value.toUpperCase()})}
                       placeholder="INGRESE LA DIRECCIÓN DOMICILIARIA..."
-                      className="border-zinc-200 bg-zinc-50/30 h-9 !text-[10px] font-semibold uppercase shadow-none focus-within:border-zinc-400 text-zinc-900 placeholder:text-zinc-300 placeholder:!text-[10px]"
+                      className="border-zinc-200 bg-zinc-50/30 h-9 !text-[11px] font-semibold uppercase shadow-none focus-within:border-zinc-400 text-zinc-900 placeholder:text-zinc-300 placeholder:!text-[11px]"
                     />
                   </div>
                 )}
@@ -396,7 +396,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-9 !text-[10px] font-medium shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 !text-[11px] font-medium shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
@@ -404,7 +404,7 @@ export default function ContractsPage() {
                      <textarea 
                         value={formData.description}
                         onChange={e => setFormData({...formData, description: e.target.value.toUpperCase()})}
-                        className="w-full border border-zinc-200 bg-zinc-50/30 min-h-[110px] p-4 !text-[10px] font-medium rounded-xl focus:outline-none transition-all outline-none uppercase leading-relaxed resize-none"
+                        className="w-full border border-zinc-200 bg-zinc-50/30 min-h-[110px] p-4 !text-[11px] font-medium rounded-xl focus:outline-none transition-all outline-none uppercase leading-relaxed resize-none"
                      />
                   </div>
 
@@ -424,22 +424,22 @@ export default function ContractsPage() {
                                 });
                             }}
                             onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                            className="pl-8 border-zinc-200 h-9 font-medium !text-[10px] bg-zinc-50/30" 
+                            className="pl-8 border-zinc-200 h-9 font-medium !text-[11px] bg-zinc-50/30" 
                          />
                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                       </div>
                     </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha de Firma</Label>
-                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Inicio Contrato</Label>
-                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Fin Contrato</Label>
-                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 !text-[10px] font-medium uppercase bg-zinc-50/30" />
+                        <Input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-zinc-50/30" />
                      </div>
                   </div>
 
@@ -452,13 +452,13 @@ export default function ContractsPage() {
                              const total = parseFloat(formData.totalAmount) || 0;
                              setFormData({...formData, paymentTerms: v, downPayment: is50 ? (total/2).toString() : formData.downPayment});
                         }}>
-                           <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
+                           <SelectTrigger className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                               <SelectValue />
                            </SelectTrigger>
                            <SelectContent className="bg-white rounded-xl border-zinc-200">
-                              <SelectItem value="50-50" className="text-[10px] font-medium uppercase">50% / 50%</SelectItem>
-                              <SelectItem value="INSTALLMENTS" className="text-[10px] font-medium uppercase">Inicial + Cuotas</SelectItem>
-                              <SelectItem value="TOTAL" className="text-[10px] font-medium uppercase">Total Anticipado</SelectItem>
+                              <SelectItem value="50-50" className="!text-[11px] font-medium uppercase">50% / 50%</SelectItem>
+                              <SelectItem value="INSTALLMENTS" className="!text-[11px] font-medium uppercase">Inicial + Cuotas</SelectItem>
+                              <SelectItem value="TOTAL" className="!text-[11px] font-medium uppercase">Total Anticipado</SelectItem>
                            </SelectContent>
                         </Select>
                      </div>
@@ -472,7 +472,7 @@ export default function ContractsPage() {
                                 value={formData.downPayment}
                                 onChange={e => setFormData({...formData, downPayment: e.target.value})}
                                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                                className="pl-8 border-zinc-200 h-9 font-medium !text-[10px] bg-white rounded-xl shadow-none outline-none w-full" 
+                                className="pl-8 border-zinc-200 h-9 font-medium !text-[11px] bg-white rounded-xl shadow-none outline-none w-full" 
                              />
                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                           </div>
@@ -483,34 +483,34 @@ export default function ContractsPage() {
                          <div className="space-y-1.5 animate-in zoom-in-95 duration-200">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">N° Cuotas</Label>
                             <Select value={formData.installments} onValueChange={v => setFormData({...formData, installments: v})}>
-                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
-                                  <SelectItem value="1" className="text-[10px] font-medium">1 CUOTA</SelectItem>
-                                  <SelectItem value="2" className="text-[10px] font-medium">2 CUOTAS</SelectItem>
-                                  <SelectItem value="3" className="text-[10px] font-medium">3 CUOTAS</SelectItem>
-                                  <SelectItem value="4" className="text-[10px] font-medium">4 CUOTAS</SelectItem>
-                                  <SelectItem value="5" className="text-[10px] font-medium">5 CUOTAS</SelectItem>
-                                  <SelectItem value="6" className="text-[10px] font-medium">6 CUOTAS</SelectItem>
-                                  <SelectItem value="8" className="text-[10px] font-medium">8 CUOTAS</SelectItem>
-                                  <SelectItem value="10" className="text-[10px] font-medium">10 CUOTAS</SelectItem>
-                                  <SelectItem value="12" className="text-[10px] font-medium">12 CUOTAS</SelectItem>
-                                  <SelectItem value="24" className="text-[10px] font-medium">24 CUOTAS</SelectItem>
+                                  <SelectItem value="1" className="!text-[11px] font-medium">1 CUOTA</SelectItem>
+                                  <SelectItem value="2" className="!text-[11px] font-medium">2 CUOTAS</SelectItem>
+                                  <SelectItem value="3" className="!text-[11px] font-medium">3 CUOTAS</SelectItem>
+                                  <SelectItem value="4" className="!text-[11px] font-medium">4 CUOTAS</SelectItem>
+                                  <SelectItem value="5" className="!text-[11px] font-medium">5 CUOTAS</SelectItem>
+                                  <SelectItem value="6" className="!text-[11px] font-medium">6 CUOTAS</SelectItem>
+                                  <SelectItem value="8" className="!text-[11px] font-medium">8 CUOTAS</SelectItem>
+                                  <SelectItem value="10" className="!text-[11px] font-medium">10 CUOTAS</SelectItem>
+                                  <SelectItem value="12" className="!text-[11px] font-medium">12 CUOTAS</SelectItem>
+                                  <SelectItem value="24" className="!text-[11px] font-medium">24 CUOTAS</SelectItem>
                                </SelectContent>
                             </Select>
                          </div>
                          <div className="space-y-1.5">
                             <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Origen</Label>
                             <Select value={formData.contactMethod} onValueChange={v => setFormData({...formData, contactMethod: v})}>
-                               <SelectTrigger className="border-zinc-200 h-9 text-[10px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
+                               <SelectTrigger className="border-zinc-200 h-9 !text-[11px] font-medium uppercase bg-white rounded-xl shadow-none outline-none">
                                   <SelectValue />
                                </SelectTrigger>
                                <SelectContent className="bg-white rounded-xl border-zinc-200">
-                                  <SelectItem value="WHATSAPP" className="text-[10px] font-medium uppercase">WhatsApp</SelectItem>
-                                  <SelectItem value="FACEBOOK" className="text-[10px] font-medium uppercase">Facebook</SelectItem>
-                                  <SelectItem value="INSTAGRAM" className="text-[10px] font-medium uppercase">Instagram</SelectItem>
-                                  <SelectItem value="REFERAL" className="text-[10px] font-medium uppercase">Recomendación</SelectItem>
+                                  <SelectItem value="WHATSAPP" className="!text-[11px] font-medium uppercase">WhatsApp</SelectItem>
+                                  <SelectItem value="FACEBOOK" className="!text-[11px] font-medium uppercase">Facebook</SelectItem>
+                                  <SelectItem value="INSTAGRAM" className="!text-[11px] font-medium uppercase">Instagram</SelectItem>
+                                  <SelectItem value="REFERAL" className="!text-[11px] font-medium uppercase">Recomendación</SelectItem>
                                </SelectContent>
                             </Select>
                          </div>
