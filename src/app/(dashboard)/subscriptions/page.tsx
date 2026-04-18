@@ -361,11 +361,14 @@ export default function SubscriptionsPage() {
               {/* Servicio */}
               <div className="space-y-1.5">
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Catálogo de Servicios</Label>
-                <Select value={formData.serviceId} onValueChange={v => setFormData({...formData, serviceId: v})}>
-                  <SelectTrigger className="border-zinc-200 h-10 text-xs font-semibold bg-zinc-50/30">
+                <Select value={formData.serviceId} onValueChange={v => {
+                  const s = services.find(ser => ser.id === v);
+                  setFormData({...formData, serviceId: v, price: s ? s.basePrice.toString() : formData.price});
+                }}>
+                  <SelectTrigger className="border-zinc-200 h-10 text-xs font-semibold bg-zinc-50/30 rounded-xl">
                     <SelectValue placeholder="---" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl border-zinc-100 bg-white">
                     {services.map(s => (
                       <SelectItem key={s.id} value={s.id} className="text-xs font-semibold py-2">
                         {s.name} - S/ {s.basePrice}
@@ -399,10 +402,10 @@ export default function SubscriptionsPage() {
                 <div className="space-y-1.5">
                    <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Meses Contratados</Label>
                    <Select value={formData.months} onValueChange={v => setFormData({...formData, months: v})}>
-                      <SelectTrigger className="border-zinc-100 h-10 text-xs font-semibold bg-zinc-50/30">
+                      <SelectTrigger className="border-zinc-200 h-10 text-[11px] font-semibold bg-zinc-50/30 rounded-xl px-4">
                          <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl border-zinc-100 bg-white">
                          {[1,2,3,4,5,6,12,24].map(m => (
                            <SelectItem key={m} value={m.toString()} className="text-xs font-semibold">{m} {m === 1 ? 'Mes' : 'Meses'}</SelectItem>
                          ))}
@@ -410,14 +413,29 @@ export default function SubscriptionsPage() {
                    </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Código de Oferta</Label>
-                  <Input 
-                    placeholder="PROMOCIÓN / CUPÓN"
-                    value={formData.discountCode}
-                    onChange={e => setFormData({...formData, discountCode: e.target.value})}
-                    className="border-zinc-100 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase" 
-                  />
+                  <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto Final (S/.)</Label>
+                  <div className="relative">
+                    <Input 
+                      type="number"
+                      placeholder="0.00"
+                      value={formData.price}
+                      onChange={e => setFormData({...formData, price: e.target.value})}
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                      className="pl-8 border-zinc-200 h-10 text-xs font-bold bg-zinc-50/30 rounded-xl" 
+                    />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Código de Oferta / Cupón</Label>
+                <Input 
+                  placeholder="PROMOCIÓN O REFERENCIA DE DESCUENTO..."
+                  value={formData.discountCode}
+                  onChange={e => setFormData({...formData, discountCode: e.target.value})}
+                  className="border-zinc-200 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase rounded-xl px-4" 
+                />
               </div>
 
               {/* Cálculo Rápido de Costo */}
