@@ -244,13 +244,15 @@ export default function ContractsPage() {
         customerId: finalCustomerId,
         name: formData.name.toUpperCase(),
         description: formData.description.toUpperCase(),
-        totalAmount: parseFloat(formData.totalAmount),
-        downPayment: parseFloat(formData.downPayment || "0"),
+        totalAmount: parseFloat(formData.totalAmount) || 0,
+        downPayment: parseFloat(formData.downPayment) || 0,
         status: formData.status,
         contactMethod: formData.contactMethod,
         paymentTerms: formData.paymentTerms,
         installments: formData.installments,
-        dealDate: formData.dealDate
+        dealDate: formData.dealDate,
+        startDate: formData.startDate,
+        endDate: formData.endDate
       });
 
       if (result.success) {
