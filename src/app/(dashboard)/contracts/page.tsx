@@ -345,7 +345,7 @@ export default function ContractsPage() {
                     }}
                     onKeyDown={e => e.key === 'Enter' && handleSearchCustomer()}
                     placeholder="..."
-                    className="border-none bg-transparent h-full text-sm font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
+                    className="border-none bg-transparent h-full text-[9px] font-medium tracking-tight focus-visible:ring-0 shadow-none uppercase flex-1 px-4"
                   />
                   <Button 
                     onClick={handleSearchCustomer} 
@@ -396,7 +396,7 @@ export default function ContractsPage() {
                      <Input 
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
-                        className="border-zinc-200 bg-zinc-50/30 h-9 text-[11px] font-medium shadow-none outline-none uppercase"
+                        className="border-zinc-200 bg-zinc-50/30 h-9 text-[9px] font-medium shadow-none outline-none uppercase"
                      />
                   </div>
                   <div className="space-y-1.5">
