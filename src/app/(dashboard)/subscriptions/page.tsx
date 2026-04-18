@@ -423,7 +423,7 @@ export default function SubscriptionsPage() {
               {/* Cálculo Rápido de Costo */}
               {formData.serviceId && (() => {
                 const service = services.find(s => s.id === formData.serviceId);
-                const months = parseInt(formData.months || 1);
+                const months = parseInt(formData.months?.toString() || "1");
                 const basePricePerMonth = service?.basePrice || 0;
                 const basePrice = basePricePerMonth * months;
                 const taxStatus = service?.taxStatus || 'INC_IGV';
