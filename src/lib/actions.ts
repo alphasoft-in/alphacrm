@@ -267,13 +267,13 @@ export async function getUpcomingRenewals() {
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
   try {
-    // Retorna todas las suscripciones activas (insensible a mayúsculas) ordenadas por próxima renovación
+    // Retorna todas las suscripciones activas ordenadas por próxima renovación
     return await sql`
       SELECT s.id, c.name as "customerName", ser.name as "serviceName", s."nextRenewal", s.price
       FROM "Subscription" s
       JOIN "Customer" c ON s."customerId" = c.id
       JOIN "Service" ser ON s."serviceId" = ser.id
-      WHERE UPPER(s.status) = 'ACTIVE'
+      WHERE s.status::text = 'ACTIVE' OR s.status::text = 'active'
       ORDER BY s."nextRenewal" ASC NULLS FIRST
     `;
   } catch (e) { return []; }
