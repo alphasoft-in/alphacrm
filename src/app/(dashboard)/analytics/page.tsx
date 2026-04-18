@@ -13,6 +13,7 @@ import {
   BarChart3, 
   PieChart, 
   ArrowUpRight, 
+  ArrowDownRight,
   Layers, 
   Briefcase,
   Percent,
