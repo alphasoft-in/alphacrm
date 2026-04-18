@@ -267,14 +267,14 @@ export async function getUpcomingRenewals() {
   if (!dbUrl) return [];
   const sql = neon(dbUrl);
   try {
-    // Retorna todas las suscripciones activas ordenadas por próxima renovación
+    // Retorna todas las suscripciones activas (insensible a mayúsculas) ordenadas por próxima renovación
     return await sql`
       SELECT s.id, c.name as "customerName", ser.name as "serviceName", s."nextRenewal", s.price
       FROM "Subscription" s
       JOIN "Customer" c ON s."customerId" = c.id
       JOIN "Service" ser ON s."serviceId" = ser.id
-      WHERE (s.status = 'ACTIVE' OR s.status = 'active')
-      ORDER BY COALESCE(s."nextRenewal", '1900-01-01') ASC
+      WHERE UPPER(s.status) = 'ACTIVE'
+      ORDER BY s."nextRenewal" ASC NULLS FIRST
     `;
   } catch (e) { return []; }
 }
