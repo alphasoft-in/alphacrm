@@ -408,7 +408,7 @@ export default function ContractsPage() {
                      />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pt-1">
+                  <div className="grid grid-cols-4 gap-4 pt-1">
                     <div className="space-y-1.5">
                       <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Inversión Pactada (S/.)</Label>
                       <div className="relative">
@@ -433,9 +433,6 @@ export default function ContractsPage() {
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha de Firma</Label>
                         <Input type="date" value={formData.dealDate} onChange={e => setFormData({...formData, dealDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
                      </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                         <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Fecha Inicio Contrato</Label>
                         <Input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="border-zinc-200 h-9 text-xs font-medium uppercase bg-zinc-50/30" />
