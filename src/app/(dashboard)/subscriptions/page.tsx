@@ -434,7 +434,7 @@ export default function SubscriptionsPage() {
                   placeholder="PROMOCIÓN O REFERENCIA DE DESCUENTO..."
                   value={formData.discountCode}
                   onChange={e => setFormData({...formData, discountCode: e.target.value})}
-                  className="border-zinc-200 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase rounded-xl px-4 shadow-none" 
+                  className="border-zinc-200 h-10 text-[10px] font-semibold bg-zinc-50/30 uppercase rounded-xl px-4 shadow-none placeholder:text-[8px] placeholder:font-medium placeholder:tracking-wider" 
                 />
               </div>
 
