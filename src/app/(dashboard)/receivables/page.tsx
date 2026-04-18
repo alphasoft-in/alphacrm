@@ -79,61 +79,57 @@ export default function ReceivablesPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-zinc-100 bg-zinc-900 shadow-none rounded-2xl border col-span-1 md:col-span-1">
+        <Card className="border-zinc-100 bg-zinc-900 shadow-none rounded-2xl border">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-1.5 bg-zinc-800 rounded-lg text-white">
-                <TrendingUp size={14} />
-              </div>
-              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Deuda Total</span>
+               <div className="p-1.5 bg-rose-500 rounded-lg text-white">
+                  <AlertTriangle size={14} />
+               </div>
+               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Ratio de Morosidad</span>
             </div>
-            <h3 className="text-2xl font-medium tracking-tighter text-white">S/ {totalReceivable.toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
+            <h3 className="text-2xl font-medium tracking-tighter text-white">
+              {totalReceivable > 0 ? ((receivables.filter(r => new Date(r.date) < new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0) / totalReceivable) * 100).toFixed(0) : '0'}%
+            </h3>
+            <p className="text-[7px] font-bold text-zinc-500 uppercase mt-1">De la deuda total en mora</p>
           </CardContent>
         </Card>
 
         <Card className="border-zinc-100 bg-white shadow-none rounded-2xl border">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
-                <CheckCircle2 size={14} />
-              </div>
-              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vigente</span>
+               <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
+                  <CheckCircle2 size={14} />
+               </div>
+               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vigente</span>
             </div>
             <h3 className="text-2xl font-medium tracking-tighter text-zinc-900">S/ {receivables.filter(r => new Date(r.date) >= new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0).toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
-            <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">Dentro del plazo</p>
+            <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">Total por vencer</p>
           </CardContent>
         </Card>
 
         <Card className="border-zinc-100 bg-white shadow-none rounded-2xl border">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-1.5 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
-                <AlertTriangle size={14} />
-              </div>
-              <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vencida</span>
+               <div className="p-1.5 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
+                  <AlertTriangle size={14} />
+               </div>
+               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Cartera Vencida</span>
             </div>
             <h3 className="text-2xl font-medium tracking-tighter text-rose-600">S/ {receivables.filter(r => new Date(r.date) < new Date()).reduce((acc, r) => acc + parseFloat(r.balance), 0).toLocaleString('en-PE', { minimumFractionDigits: 2 })}</h3>
-            <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">{overdueCount} compromisos en mora</p>
+            <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">{overdueCount} clientes con retraso</p>
           </CardContent>
         </Card>
 
         <Card className="border-zinc-100 bg-zinc-50 shadow-none rounded-2xl border">
-          <CardContent className="p-5 text-center flex flex-col items-center justify-center h-full">
-            <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Eficiencia</p>
-            <div className="relative flex items-center justify-center">
-              <svg className="w-12 h-12 transform -rotate-90">
-                <circle className="text-zinc-200" strokeWidth="3" stroke="currentColor" fill="transparent" r="20" cx="24" cy="24" />
-                <circle
-                  className="text-zinc-900 transition-all duration-1000 ease-out"
-                  strokeWidth="3"
-                  strokeDasharray={2 * Math.PI * 20}
-                  strokeDashoffset={2 * Math.PI * 20 * (1 - (receivables.length > 0 ? 0.85 : 0) / 1)}
-                  strokeLinecap="round"
-                  stroke="currentColor" fill="transparent" r="20" cx="24" cy="24"
-                />
-              </svg>
-              <span className="absolute text-[9px] font-black text-zinc-900">85%</span>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-2">
+               <div className="p-1.5 bg-zinc-200 rounded-lg text-zinc-600 border border-zinc-300">
+                  <Users size={14} />
+               </div>
+               <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Clientes con Compromisos</span>
             </div>
+            <h3 className="text-2xl font-medium tracking-tighter text-zinc-900">{[...new Set(receivables.map(r => r.customerName))].length}</h3>
+            <p className="text-[7px] font-bold text-zinc-400 uppercase mt-1">En cartera de cobro</p>
           </CardContent>
         </Card>
       </div>
