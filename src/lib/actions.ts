@@ -733,18 +733,18 @@ export async function getAccountsReceivable() {
   try {
     const receivables = await sql`
       SELECT * FROM (
-        -- Deuda de Contratos (Deals)
+        -- Deuda de Contratos (Cualquiera que no esté cancelado y tenga saldo)
         SELECT d.id, c.name as "customerName", d.name as "description", 
           (COALESCE(d."totalAmount", 0) - COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "dealId" = d.id AND status = 'COMPLETED'), 0)) as balance,
           d."dealDate" as "date",
           'DEAL' as source
         FROM "Deal" d
         JOIN "Customer" c ON d."customerId" = c.id
-        WHERE d.status != 'CANCELLED' AND d.status != 'COMPLETED'
+        WHERE LOWER(d.status) != 'cancelled'
         
         UNION ALL
 
-        -- Deuda de Suscripciones
+        -- Deuda de Suscripciones (Todas las activas)
         SELECT s.id, c.name as "customerName", ser.name as "description",
           COALESCE(s.price, 0) as balance,
           s."nextRenewal" as "date",
@@ -752,9 +752,9 @@ export async function getAccountsReceivable() {
         FROM "Subscription" s
         JOIN "Customer" c ON s."customerId" = c.id
         JOIN "Service" ser ON s."serviceId" = ser.id
-        WHERE (s.status = 'ACTIVE' OR s.status = 'active')
+        WHERE LOWER(s.status) = 'active'
       ) AS combined
-      WHERE balance > 0
+      WHERE balance > 0.01
       ORDER BY "date" ASC
     `;
     return receivables;
