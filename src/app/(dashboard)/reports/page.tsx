@@ -155,11 +155,15 @@ export default function ReportsPage() {
     // Pagos oficiales
     const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED');
     
-    // Movimientos de caja chica vinculados que no sean duplicados de pagos (identificados por notas o IDs)
+    // Movimientos de caja chica vinculados que no sean duplicados de pagos
+    // Comprobamos por ID sincronizado (p.id === `SYNC-${m.id}`) o por coincidencia de monto y fecha
     const subMovements = movements.filter(m => 
       m.subscriptionId === sub.id && 
       m.type === 'INCOME' &&
-      !subPayments.some(p => p.amount == m.amount && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+      !subPayments.some(p => 
+        p.id === `SYNC-${m.id}` || 
+        (Number(p.amount) === Number(m.amount) && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+      )
     );
 
     const totalPaidFromPayments = subPayments.reduce((acc, p) => acc + Number(p.amount), 0);
@@ -189,7 +193,10 @@ export default function ReportsPage() {
     const dealMovements = movements.filter(m => 
       m.dealId === deal.id && 
       m.type === 'INCOME' &&
-      !dealPayments.some(p => p.amount == m.amount && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+      !dealPayments.some(p => 
+        p.id === `SYNC-${m.id}` || 
+        (Number(p.amount) === Number(m.amount) && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+      )
     );
 
     const totalPaidFromPayments = dealPayments.reduce((acc, p) => acc + Number(p.amount), 0);
