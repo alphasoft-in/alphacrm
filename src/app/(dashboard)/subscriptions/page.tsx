@@ -442,28 +442,45 @@ export default function SubscriptionsPage() {
               {formData.serviceId && (() => {
                 const service = services.find(s => s.id === formData.serviceId);
                 const months = parseInt(formData.months?.toString() || "1");
-                const basePricePerMonth = service?.basePrice || 0;
-                const basePrice = basePricePerMonth * months;
+                const rawBasePrice = service?.basePrice || 0;
+                const billingCycle = service?.billingCycle || 'MONTHLY';
                 const taxStatus = service?.taxStatus || 'INC_IGV';
                 
-                let subtotal = basePrice;
+                // Determinar costo base mensual real según el ciclo del servicio
+                let basePricePerMonth = rawBasePrice;
+                let cycleLabel = "Mensual";
+
+                if (billingCycle === 'ANNUAL') {
+                  basePricePerMonth = rawBasePrice / 12;
+                  cycleLabel = "Anual";
+                } else if (billingCycle === 'QUARTERLY') {
+                  basePricePerMonth = rawBasePrice / 3;
+                  cycleLabel = "Trimestral";
+                } else if (billingCycle === 'SEMI_ANNUAL') {
+                  basePricePerMonth = rawBasePrice / 6;
+                  cycleLabel = "Semestral";
+                }
+
+                const totalPeriodPrice = basePricePerMonth * months;
+                
+                let subtotal = totalPeriodPrice;
                 let igvAmount = 0;
-                let total = basePrice;
+                let total = totalPeriodPrice;
 
                 if (taxStatus === 'INC_IGV') {
-                   subtotal = basePrice / 1.18;
-                   igvAmount = basePrice - subtotal;
+                   subtotal = totalPeriodPrice / 1.18;
+                   igvAmount = totalPeriodPrice - subtotal;
                 } else if (taxStatus === 'PLUS_IGV') {
-                   igvAmount = basePrice * 0.18;
-                   total = basePrice + igvAmount;
+                   igvAmount = totalPeriodPrice * 0.18;
+                   total = totalPeriodPrice + igvAmount;
                 }
 
                 return (
                   <div className="border border-zinc-100 bg-zinc-50/30 p-4 rounded-xl space-y-2">
                     <div className="flex items-center justify-between text-zinc-500">
-                      <span className="text-[9px] font-medium uppercase tracking-widest">Costo Unitario (S/.)</span>
+                      <span className="text-[9px] font-medium uppercase tracking-widest">Costo Base ({cycleLabel})</span>
                       <span className="text-[9px] font-medium tracking-tight">
-                        S/ {parseFloat(basePricePerMonth).toFixed(2)} / mes
+                        S/ {parseFloat(rawBasePrice).toFixed(2)}
                       </span>
                     </div>
 
