@@ -159,7 +159,7 @@ export default function SubscriptionsPage() {
   };
 
   const handleEdit = (sub: any) => {
-    const formattedDocType = (sub.docType || "dni").trim().toLowerCase();
+    const formattedDocType = (sub.docType || "DNI").trim().toUpperCase();
     setFormData({
       id: sub.id,
       customerId: sub.customerId,
@@ -316,14 +316,13 @@ export default function SubscriptionsPage() {
                 <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Identificar Cliente</Label>
                 <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden h-12 bg-white focus-within:border-zinc-400 transition-all shadow-sm focus-within:shadow-md">
                   <Select value={formData.docType} onValueChange={v => setFormData({...formData, docType: v})}>
-                    <SelectTrigger className="w-[110px] border-none rounded-none font-semibold text-xs focus:ring-0 uppercase h-full bg-zinc-50/50 border-r border-zinc-100 px-4 shadow-none">
-                      <SelectValue />
+                    <SelectTrigger className="w-[100px] h-12 border-none bg-zinc-50/50 rounded-none border-r border-zinc-100 text-xs font-bold uppercase ring-0 focus:ring-0">
+                      <SelectValue placeholder="TIPO" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dni" className="text-xs uppercase font-semibold">DNI</SelectItem>
-                      <SelectItem value="ruc" className="text-xs uppercase font-semibold">RUC</SelectItem>
-                      <SelectItem value="ce" className="text-xs uppercase font-semibold">C. Extranjería</SelectItem>
-                      <SelectItem value="pasaporte" className="text-xs uppercase font-semibold">Pasaporte</SelectItem>
+                    <SelectContent className="rounded-xl border-zinc-200">
+                      <SelectItem value="DNI" className="text-[10px] font-bold">DNI</SelectItem>
+                      <SelectItem value="RUC" className="text-[10px] font-bold">RUC</SelectItem>
+                      <SelectItem value="CE" className="text-[10px] font-bold">C.E.</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input 
