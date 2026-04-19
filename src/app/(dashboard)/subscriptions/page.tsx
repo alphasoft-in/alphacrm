@@ -143,14 +143,16 @@ export default function SubscriptionsPage() {
       id: "",
       customerId: "",
       serviceId: "",
-      docType: "dni",
+      docType: "RUC",
       docNumber: "",
       startDate: new Date().toISOString().split('T')[0],
       price: "",
       productName: "",
       status: "ACTIVE",
       discountCode: "",
-      months: "1"
+      months: "1",
+      discountType: "PERCENT",
+      discountValue: "0"
     });
     setFoundCustomer(null);
     setOpen(true);
@@ -164,12 +166,14 @@ export default function SubscriptionsPage() {
       serviceId: sub.serviceId,
       docType: formattedDocType, 
       docNumber: (sub.docNumber || "").trim(), 
-      startDate: new Date(sub.startDate).toISOString().split('T')[0],
-      price: sub.price ? sub.price.toString() : "",
+      startDate: sub.startDate ? new Date(sub.startDate).toISOString().split('T')[0] : "",
+      price: sub.price?.toString() || "",
       productName: sub.productName || "",
-      status: sub.status,
+      status: sub.status || "ACTIVE",
       discountCode: sub.discountCode || "",
-      months: (sub.months || 1).toString()
+      months: sub.months?.toString() || "1",
+      discountType: sub.discountType || "PERCENT",
+      discountValue: sub.discountValue?.toString() || "0"
     });
     setFoundCustomer({ 
       id: sub.customerId, 
