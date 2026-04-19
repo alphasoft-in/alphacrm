@@ -95,14 +95,16 @@ export default function SubscriptionsPage() {
     id: "",
     customerId: "",
     serviceId: "",
-    docType: "dni",
-    docNumber: "",
+    productName: "",
     startDate: new Date().toISOString().split('T')[0],
     price: "",
-    productName: "",
+    docType: "RUC",
+    docNumber: "",
+    months: "1",
     status: "ACTIVE",
     discountCode: "",
-    months: "1"
+    discountType: "PERCENT",
+    discountValue: "0"
   });
 
   useEffect(() => {
@@ -412,6 +414,35 @@ export default function SubscriptionsPage() {
                       </SelectContent>
                    </Select>
                 </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Descuento Especial</Label>
+                  <div className="flex gap-2">
+                    <Select 
+                      value={formData.discountType} 
+                      onValueChange={v => setFormData({...formData, discountType: v})}
+                    >
+                      <SelectTrigger className="w-20 border-zinc-200 h-10 text-[10px] font-bold bg-zinc-50/30 rounded-xl shadow-none">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="PERCENT" className="text-xs font-medium">%</SelectItem>
+                        <SelectItem value="AMOUNT" className="text-xs font-medium">S/</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      type="number"
+                      placeholder="0"
+                      value={formData.discountValue}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormData({...formData, discountValue: val});
+                      }}
+                      className="border-zinc-200 h-10 text-xs font-bold bg-zinc-50/30 rounded-xl shadow-none px-4" 
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <Label className="text-[9px] font-semibold text-zinc-400 uppercase tracking-widest ml-1">Monto Final (S/.)</Label>
                   <div className="relative">
@@ -426,6 +457,7 @@ export default function SubscriptionsPage() {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 font-bold">S/</span>
                   </div>
                 </div>
+              </div>
               </div>
 
               <div className="space-y-1.5">
@@ -463,17 +495,32 @@ export default function SubscriptionsPage() {
 
                 const totalPeriodPrice = basePricePerMonth * months;
                 
-                let subtotal = totalPeriodPrice;
+                // Aplicar Descuento
+                const dValue = parseFloat(formData.discountValue || "0");
+                let discountAmount = 0;
+                if (formData.discountType === 'PERCENT') {
+                  discountAmount = totalPeriodPrice * (dValue / 100);
+                } else {
+                  discountAmount = dValue;
+                }
+
+                const priceAfterDiscount = Math.max(0, totalPeriodPrice - discountAmount);
+                
+                let subtotal = priceAfterDiscount;
                 let igvAmount = 0;
-                let total = totalPeriodPrice;
+                let total = priceAfterDiscount;
 
                 if (taxStatus === 'INC_IGV') {
-                   subtotal = totalPeriodPrice / 1.18;
-                   igvAmount = totalPeriodPrice - subtotal;
+                   subtotal = priceAfterDiscount / 1.18;
+                   igvAmount = priceAfterDiscount - subtotal;
                 } else if (taxStatus === 'PLUS_IGV') {
-                   igvAmount = totalPeriodPrice * 0.18;
-                   total = totalPeriodPrice + igvAmount;
+                   igvAmount = priceAfterDiscount * 0.18;
+                   total = priceAfterDiscount + igvAmount;
                 }
+
+                // Sincronizar con el campo de Monto Final si no se ha editado manualmente
+                // NOTA: Para evitar bucles infinitos en el render, solo sugerimos el valor visualmente
+                // o podemos usar un useEffect. Por ahora lo dejamos como cálculo en el resumen.
 
                 return (
                   <div className="border border-zinc-100 bg-zinc-50/30 p-4 rounded-xl space-y-2">
@@ -486,23 +533,32 @@ export default function SubscriptionsPage() {
 
                     <div className="flex items-center justify-between">
                       <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-widest">Subtotal ({months} {months === 1 ? 'Mes' : 'Meses'})</span>
-                      <span className="text-xs font-medium text-zinc-900 tracking-tight">
-                        S/ {subtotal.toFixed(2)}
+                      <span className="text-xs font-medium text-zinc-500 tracking-tight">
+                        S/ {(basePricePerMonth * months).toFixed(2)}
                       </span>
                     </div>
+
+                    {discountAmount > 0 && (
+                      <div className="flex items-center justify-between text-emerald-600 bg-emerald-50/50 px-2 py-1 rounded-lg">
+                        <span className="text-[9px] font-semibold uppercase tracking-widest">Descuento Aplicado</span>
+                        <span className="text-xs font-bold tracking-tight">
+                          - S/ {discountAmount.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                     
                     <div className="flex items-center justify-between">
                       <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-widest">
                         IGV (18%) {taxStatus === 'INC_IGV' && <span className="text-[8px] lowercase font-normal">(incluido)</span>}
                       </span>
-                      <span className="text-xs font-medium text-zinc-500 tracking-tight">
+                      <span className="text-xs font-medium text-zinc-400 tracking-tight">
                         S/ {igvAmount.toFixed(2)}
                       </span>
                     </div>
                     
                     <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60">
-                      <span className="text-[9px] font-semibold text-zinc-900 uppercase tracking-widest">Total Estimado</span>
-                      <span className="text-base font-semibold text-zinc-950 tracking-tighter">
+                      <span className="text-[9px] font-semibold text-zinc-900 uppercase tracking-widest">Total Final</span>
+                      <span className="text-base font-bold text-zinc-950 tracking-tighter">
                         S/ {total.toFixed(2)}
                       </span>
                     </div>
