@@ -14,6 +14,7 @@ import {
   UserCheck
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
+import { useState, useEffect } from "react";
 import { queryDocument, saveCustomer, getCustomers, updateCustomer, deactivateCustomer, getTopCustomers } from "@/lib/actions";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { toast } from "sonner";
