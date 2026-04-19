@@ -14,8 +14,8 @@ import {
   UserCheck
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
-import { useState, useEffect } from "react";
-import { queryDocument, saveCustomer, getCustomers, updateCustomer, deactivateCustomer } from "@/lib/actions";
+import { queryDocument, saveCustomer, getCustomers, updateCustomer, deactivateCustomer, getTopCustomers } from "@/lib/actions";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -76,6 +76,8 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [topCustomers, setTopCustomers] = useState<any[]>([]);
+  const [isChartVisible, setIsChartVisible] = useState(true);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -85,8 +87,9 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const data = await getCustomers();
+      const [data, topData] = await Promise.all([getCustomers(), getTopCustomers()]);
       setDbCustomers(data || []);
+      setTopCustomers(topData || []);
       setCurrentPage(1);
     } catch (error) {
       toast.error("Error al cargar clientes");
@@ -401,6 +404,73 @@ export default function CustomersPage() {
           </DialogContent>
         </Dialog>
       </header>
+
+      {/* Sección de Análisis de Cartera (Top 5) */}
+      {topCustomers.length > 0 && (
+        <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-[11px] font-bold text-zinc-900 uppercase tracking-widest">Top 5 Clientes de Mayor Valor</CardTitle>
+              <p className="text-[9px] font-medium text-zinc-400 uppercase tracking-wider mt-1">Basado en volumen total de pagos recibidos (S/)</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setIsChartVisible(!isChartVisible)}
+              className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-900"
+            >
+              {isChartVisible ? "Ocultar" : "Mostrar"}
+            </Button>
+          </CardHeader>
+          {isChartVisible && (
+            <CardContent className="h-[200px] pt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topCustomers}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis 
+                    dataKey="name" 
+                    type="category" 
+                    width={100} 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fontWeight: 700, fill: '#71717a' }}
+                  />
+                  <Tooltip 
+                    cursor={{ fill: '#f4f4f5', radius: 8 }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-zinc-950 border-none shadow-2xl p-3 rounded-xl">
+                            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">{payload[0].payload.fullName}</p>
+                            <p className="text-sm font-bold text-white tracking-tight">S/ {payload[0].value?.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    radius={[0, 8, 8, 0]} 
+                    barSize={24}
+                  >
+                    {topCustomers.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={index === 0 ? '#09090b' : index === 1 ? '#27272a' : index === 2 ? '#3f3f46' : index === 3 ? '#52525b' : '#71717a'} 
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
       <Card className="border-zinc-200 bg-white shadow-sm overflow-hidden rounded-2xl">
         <CardHeader className="p-4 border-b border-zinc-100">

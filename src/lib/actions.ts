@@ -935,3 +935,38 @@ export async function getAnalyticsData() {
     return null;
   }
 }
+
+export async function getTopCustomers() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return [];
+  const sql = neon(dbUrl);
+  try {
+    const data = await sql`
+      SELECT name, SUM(amount::numeric) as value FROM (
+        SELECT c.name, p.amount
+        FROM "Customer" c
+        JOIN "Payment" p ON c.id = p."customerId"
+        WHERE p.status = 'COMPLETED'
+        
+        UNION ALL
+        
+        SELECT COALESCE(c.name, pc."customerName") as name, pc.amount
+        FROM "PettyCash" pc
+        LEFT JOIN "Customer" c ON pc."customerId" = c.id
+        WHERE pc.type = 'INCOME' AND (pc."customerId" IS NOT NULL OR pc."customerName" IS NOT NULL)
+      ) as combined
+      GROUP BY name
+      ORDER BY value DESC
+      LIMIT 5
+    `;
+    return data.map((d: any) => ({
+      name: d.name.split(' ')[0] + (d.name.split(' ')[1] ? ' ' + d.name.split(' ')[1] : ''),
+      fullName: d.name,
+      value: parseFloat(d.value)
+    }));
+  } catch (e) { 
+    console.error("Error en getTopCustomers:", e);
+    return []; 
+  }
+}
+
