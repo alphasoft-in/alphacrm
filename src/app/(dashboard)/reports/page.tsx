@@ -152,9 +152,20 @@ export default function ReportsPage() {
 
   // Cálculos para el Reporte Detallado (Estado de Cuenta por Servicio/Contrato)
   const detailedSubscriptions = subscriptions.map(sub => {
-    const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED')
-                                .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
-    const totalPaid = subPayments.reduce((acc, p) => acc + Number(p.amount), 0);
+    // Pagos oficiales
+    const subPayments = payments.filter(p => p.subscriptionId === sub.id && p.status === 'COMPLETED');
+    
+    // Movimientos de caja chica vinculados que no sean duplicados de pagos (identificados por notas o IDs)
+    const subMovements = movements.filter(m => 
+      m.subscriptionId === sub.id && 
+      m.type === 'INCOME' &&
+      !subPayments.some(p => p.amount == m.amount && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+    );
+
+    const totalPaidFromPayments = subPayments.reduce((acc, p) => acc + Number(p.amount), 0);
+    const totalPaidFromMovements = subMovements.reduce((acc, m) => acc + Number(m.amount), 0);
+    const totalPaid = totalPaidFromPayments + totalPaidFromMovements;
+    
     const balance = Number(sub.price) - totalPaid;
     
     return {
@@ -166,30 +177,39 @@ export default function ReportsPage() {
       totalPaid: totalPaid,
       balance: balance,
       status: sub.status,
-      lastPayment: subPayments.length > 0 ? subPayments[0].paymentDate : null,
-      paymentsCount: subPayments.length,
-      history: subPayments // Guardar historial de pagos
+      lastPayment: subPayments.length > 0 ? subPayments[0].paymentDate : (subMovements.length > 0 ? subMovements[0].date : null),
+      paymentsCount: subPayments.length + subMovements.length,
+      history: [...subPayments, ...subMovements.map(m => ({ amount: m.amount, paymentDate: m.date, method: 'CASH', notes: m.description }))]
     };
   });
 
   const detailedDeals = deals.map(deal => {
-    const dealPayments = payments.filter(p => p.dealId === deal.id && p.status === 'COMPLETED')
-                                 .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
-    const totalPaid = dealPayments.reduce((acc, p) => acc + Number(p.amount), 0);
+    const dealPayments = payments.filter(p => p.dealId === deal.id && p.status === 'COMPLETED');
+    
+    const dealMovements = movements.filter(m => 
+      m.dealId === deal.id && 
+      m.type === 'INCOME' &&
+      !dealPayments.some(p => p.amount == m.amount && new Date(p.paymentDate).toDateString() === new Date(m.date).toDateString())
+    );
+
+    const totalPaidFromPayments = dealPayments.reduce((acc, p) => acc + Number(p.amount), 0);
+    const totalPaidFromMovements = dealMovements.reduce((acc, m) => acc + Number(m.amount), 0);
+    const totalPaid = totalPaidFromPayments + totalPaidFromMovements;
+    
     const balance = Number(deal.totalAmount) - totalPaid;
     
     return {
       id: deal.id,
       customerName: deal.customerName || 'SIN NOMBRE',
       customerDoc: deal.docNumber || '',
-      serviceName: `CONTRATO: ${deal.name}`,
+      serviceName: deal.name || 'CONTRATO',
       totalCost: Number(deal.totalAmount),
       totalPaid: totalPaid,
       balance: balance,
       status: deal.status,
-      lastPayment: dealPayments.length > 0 ? dealPayments[0].paymentDate : null,
-      paymentsCount: dealPayments.length,
-      history: dealPayments // Guardar historial de pagos
+      lastPayment: dealPayments.length > 0 ? dealPayments[0].paymentDate : (dealMovements.length > 0 ? dealMovements[0].date : null),
+      paymentsCount: dealPayments.length + dealMovements.length,
+      history: [...dealPayments, ...dealMovements.map(m => ({ amount: m.amount, paymentDate: m.date, method: 'CASH', notes: m.description }))]
     };
   });
 
