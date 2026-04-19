@@ -86,7 +86,10 @@ export async function getCustomerByDoc(docNumber: string) {
       const customer = results[0];
       const subscriptions = await sql`
         SELECT s.id, ser.name as "serviceName", s."productName", s.price,
-        COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "subscriptionId" = s.id AND status = 'COMPLETED'), 0) as "paidAmount"
+        (
+          COALESCE((SELECT SUM(amount) FROM "Payment" WHERE "subscriptionId" = s.id AND status = 'COMPLETED'), 0) +
+          COALESCE((SELECT SUM(amount) FROM "PettyCash" WHERE "subscriptionId" = s.id AND type = 'INCOME' AND id NOT LIKE 'SYNC-%'), 0)
+        ) as "paidAmount"
         FROM "Subscription" s
         JOIN "Service" ser ON s."serviceId" = ser.id
         WHERE s."customerId" = ${customer.id} AND s.status = 'ACTIVE'
